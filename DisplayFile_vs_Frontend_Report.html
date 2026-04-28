@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AS/400 Display File vs React Frontend — Inventory Management Comparison Report</title>
+<style>
+  @page { size: A4 landscape; margin: 15mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 9.5pt;
+    color: #1e293b;
+    line-height: 1.5;
+    margin: 0;
+    padding: 20px;
+    background: #fff;
+  }
+  .cover {
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    text-align: center;
+  }
+  .cover h1 {
+    font-size: 28pt;
+    color: #1e293b;
+    margin-bottom: 8px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .cover .subtitle {
+    font-size: 14pt;
+    color: #6366f1;
+    font-weight: 600;
+    margin-bottom: 40px;
+  }
+  .cover .meta {
+    font-size: 10pt;
+    color: #64748b;
+    line-height: 2;
+  }
+  .cover .meta strong { color: #334155; }
+  .cover .line {
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 2px;
+    margin: 30px auto;
+  }
+  h1 { font-size: 18pt; color: #1e293b; margin: 30px 0 10px; border-bottom: 3px solid #6366f1; padding-bottom: 6px; }
+  h2 { font-size: 13pt; color: #334155; margin: 22px 0 8px; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 4px; }
+  h3 { font-size: 11pt; color: #475569; margin: 16px 0 6px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 18px;
+    font-size: 8.5pt;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #1e293b;
+    color: #fff;
+    font-weight: 600;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  tr:nth-child(even) { background: #f8fafc; }
+  tr:hover { background: #eef2ff; }
+  td:first-child { font-weight: 600; white-space: nowrap; color: #4338ca; }
+  .paradigm {
+    background: #eef2ff;
+    border-left: 4px solid #6366f1;
+    padding: 10px 14px;
+    margin: 10px 0 18px;
+    border-radius: 0 6px 6px 0;
+    font-size: 9pt;
+  }
+  .paradigm strong { color: #4338ca; }
+  .tag-new {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .tag-enhanced {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .tag-key {
+    display: inline-block;
+    background: #fce7f3;
+    color: #9d174d;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .tag-removed {
+    display: inline-block;
+    background: #fee2e2;
+    color: #991b1b;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 8pt;
+    color: #7c3aed;
+  }
+  .footer {
+    text-align: center;
+    font-size: 8pt;
+    color: #94a3b8;
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .section { page-break-inside: avoid; }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover">
+  <h1>AS/400 Display File vs React Frontend</h1>
+  <div class="subtitle">Inventory Management &mdash; Screen Comparison Report</div>
+  <div class="line"></div>
+  <div class="meta">
+    <strong>Project:</strong> TRTCT004 &mdash; Inventory &amp; Payroll Management System<br>
+    <strong>Application:</strong> Inventory Management (trtct004-inventory)<br>
+    <strong>Source System:</strong> IBM AS/400 RPG &mdash; Programs INVMNUR, INVLSTR, INVDTLR, INVRPTR<br>
+    <strong>Target System:</strong> Spring Boot 3.3.4 + React 18 + TypeScript + Material UI 5<br>
+    <strong>Date:</strong> April 28, 2026<br>
+    <strong>Prepared by:</strong> Modernization Team
+  </div>
+</div>
+
+<!-- ==================== SECTION 1: SCREEN-LEVEL MAPPING ==================== -->
+<h1>1. Screen-Level Mapping</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>AS/400 Display File (DSPF)</th>
+      <th>Legacy RPG Program</th>
+      <th>React Frontend Component</th>
+      <th>Route</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>SCR-001 &mdash; Inventory Main Menu</td><td>INVMNUR (PGM-001)</td><td>InventoryMenu.tsx</td><td>/inventory/menu</td></tr>
+    <tr><td>2</td><td>SCR-002 &mdash; Inventory Item List</td><td>INVLSTR (PGM-002)</td><td>InventoryList.tsx</td><td>/inventory/list</td></tr>
+    <tr><td>3</td><td>SCR-003 &mdash; Item Detail (Add)</td><td>INVDTLR (PGM-003)</td><td>InventoryItemDetail.tsx</td><td>/inventory/items/new?mode=A</td></tr>
+    <tr><td>4</td><td>SCR-004 &mdash; Item Detail (Edit/Display)</td><td>INVDTLR (PGM-003)</td><td>InventoryItemDetail.tsx</td><td>/inventory/items/:id?mode=E or D</td></tr>
+    <tr><td>5</td><td>SCR-005 &mdash; Exit Confirmation</td><td>INVMNUR (PGM-001)</td><td>ExitConfirmation.tsx</td><td>/exit</td></tr>
+    <tr><td>6</td><td>SCR-006 &mdash; Reorder Report</td><td>INVRPTR (PGM-004)</td><td>ReorderReport.tsx</td><td>/inventory/report/reorder</td></tr>
+  </tbody>
+</table>
+
+<!-- ==================== SECTION 2: SCR-001 MAIN MENU ==================== -->
+<h1>2. SCR-001: Main Menu &mdash; Field-Level Comparison</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field ID</th>
+      <th>AS/400 DSPF Field</th>
+      <th>Type</th>
+      <th>React Equivalent</th>
+      <th>UI Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>F-001-01</td><td>Screen Title (constant)</td><td>Output</td><td><code>&lt;Typography variant="h4"&gt;</code> in hero section</td><td>Static text &rarr; branded hero card with icon</td></tr>
+    <tr><td>F-001-02</td><td>System Date (MNSDAT)</td><td>Output</td><td>Not displayed</td><td><span class="tag-removed">Removed</span> Browser provides date natively</td></tr>
+    <tr><td>F-001-03</td><td>System Time (MNSTIM)</td><td>Output</td><td>Not displayed</td><td><span class="tag-removed">Removed</span> Not needed in web UI</td></tr>
+    <tr><td>F-001-04</td><td>Option 1 label</td><td>Output</td><td><code>NAV_CARDS[0]</code> = "Browse Inventory"</td><td>Text label &rarr; Material UI Card with icon + description</td></tr>
+    <tr><td>F-001-05</td><td>Option 2 label</td><td>Output</td><td><code>NAV_CARDS[1]</code> = "Add New Item"</td><td>Card with gradient icon</td></tr>
+    <tr><td>F-001-06</td><td>Option 3 label</td><td>Output</td><td><code>NAV_CARDS[2]</code> = "Reorder Report"</td><td>Card with gradient icon</td></tr>
+    <tr><td>F-001-07</td><td>Option 9 label (Exit)</td><td>Output</td><td>Not on menu screen</td><td>Exit moved to sidebar/AppLayout navigation</td></tr>
+    <tr><td>F-001-08</td><td>Error Message (MNERR)</td><td>Output</td><td>Not applicable</td><td>Replaced by toast/Snackbar notifications</td></tr>
+    <tr><td>F-001-09</td><td>Selection Entry (MNSEL)</td><td>Input, 1-char</td><td><code>onClick</code> on each <code>&lt;CardActionArea&gt;</code></td><td><span class="tag-key">Key change</span> Typed numeric input &rarr; clickable navigation cards with React Router</td></tr>
+  </tbody>
+</table>
+
+<div class="paradigm">
+  <strong>Interaction Paradigm Shift:</strong> The legacy green-screen menu required typing a single digit (1/2/3/9) + Enter. The React version uses visual navigation cards with hover animations and click-to-navigate via React Router v6. The function key paradigm (F3=Exit) is replaced by browser back navigation and an explicit exit route.
+</div>
+
+<!-- ==================== SECTION 3: SCR-002 ITEM LIST ==================== -->
+<h1 class="page-break">3. SCR-002: Inventory Item List &mdash; Field-Level Comparison</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field ID</th>
+      <th>AS/400 DSPF Field</th>
+      <th>Type</th>
+      <th>React Equivalent</th>
+      <th>UI Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>F-002-01</td><td>Screen Title</td><td>Output</td><td><code>AppLayout title="Inventory Item List"</code></td><td>Rendered in reusable layout header</td></tr>
+    <tr><td>F-002-02</td><td>Op Column (LSOPT)</td><td>Input, 1-char/row</td><td>3 <code>&lt;IconButton&gt;</code> per row: Edit, View, Delete</td><td><span class="tag-key">Key change</span> "2=Edit 4=Delete 5=Display" codes &rarr; individual icon buttons with tooltips</td></tr>
+    <tr><td>F-002-03</td><td>Item ID (LSITID)</td><td>Output</td><td><code>&lt;TableCell&gt;</code> monospace, indigo color</td><td>Same data, enhanced with color coding</td></tr>
+    <tr><td>F-002-04</td><td>Item Name (LSITNM)</td><td>Output</td><td><code>&lt;TableCell&gt;</code> bold font</td><td>Same data</td></tr>
+    <tr><td>F-002-05</td><td>Category Code (LSCTGY)</td><td>Output</td><td><code>&lt;Chip&gt;</code> badge, monospace</td><td>Displayed as pill/badge instead of plain text</td></tr>
+    <tr><td>F-002-06</td><td>Qty On Hand (LSQTOH)</td><td>Output, numeric</td><td><code>&lt;TableCell&gt;</code> right-aligned, <code>.toLocaleString()</code></td><td><span class="tag-enhanced">Enhanced</span> Thousands separators</td></tr>
+    <tr><td>F-002-07</td><td>Unit Price (LSUNPR)</td><td>Output, numeric</td><td><code>&lt;TableCell&gt;</code> with $ prefix, green color</td><td><span class="tag-enhanced">Enhanced</span> Currency formatting + color</td></tr>
+    <tr><td>F-002-08</td><td>Status (LSSTAT)</td><td>Output, 1-char</td><td>Color-coded <code>&lt;Chip&gt;</code>: ACTIVE / INACTIVE / PENDING_DELETE / DELETED</td><td><span class="tag-enhanced">Enhanced</span> Single char &rarr; full-word color-coded badges</td></tr>
+    <tr><td>F-002-09</td><td>Error Line (LSERR)</td><td>Output</td><td><code>&lt;Snackbar&gt;&lt;Alert&gt;</code> toast notification</td><td>Inline error &rarr; floating notification</td></tr>
+    <tr><td>F-002-10</td><td>Record Count / "Bottom"</td><td>Output</td><td>Footer bar: <code>"{n} records found"</code></td><td>Dynamic record count in table footer</td></tr>
+    <tr><td>F-002-11</td><td>Category Filter (SRCTGY)</td><td>Input, 6-char</td><td><code>&lt;TextField label="Category"&gt;</code> with search icon</td><td>Text input with adornment</td></tr>
+    <tr><td>F-002-12</td><td>Name Filter (SRNAME)</td><td>Input, 15-char</td><td><code>&lt;TextField label="Item Name"&gt;</code> with search icon</td><td>Text input with adornment</td></tr>
+    <tr><td>&mdash;</td><td>F3=Exit / F5=Refresh / F6=Add</td><td>Function Keys</td><td>Refresh IconButton + Add New Item Button</td><td><span class="tag-key">Key change</span> Function keys &rarr; visible buttons</td></tr>
+    <tr><td>&mdash;</td><td>SFL/SFLCTL records</td><td>Subfile</td><td><code>&lt;Table&gt;</code> with <code>.map()</code> rendering</td><td>Subfile format &rarr; MUI Table with array map</td></tr>
+  </tbody>
+</table>
+
+<div class="paradigm">
+  <strong>Interaction Paradigm Shift:</strong> The AS/400 subfile list (SFL/SFLCTL) used a fixed-row output with a single "Op" input column where users typed action codes (2/4/5) next to each row and pressed Enter to process all at once. The React version provides individual action buttons per row with immediate async execution. Filtering is live (triggers on change with <code>useCallback</code>), replacing the Enter-to-submit filter model.
+</div>
+
+<!-- ==================== SECTION 4: SCR-003/004 ITEM DETAIL ==================== -->
+<h1 class="page-break">4. SCR-003/004: Item Detail &mdash; Field-Level Comparison</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field ID</th>
+      <th>AS/400 DSPF Field</th>
+      <th>Type</th>
+      <th>React Equivalent</th>
+      <th>UI Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>F-003-01</td><td>Screen Title</td><td>Output</td><td><code>AppLayout title</code> = dynamic per mode</td><td>Mode-aware title: "Add New Item" / "Edit Item &mdash; X" / "View Item &mdash; X"</td></tr>
+    <tr><td>F-003-02</td><td>Mode Indicator (DTMODE)</td><td>Output</td><td><code>&lt;Chip&gt;</code> badge with color per mode</td><td>Mode badge in header: Add=primary, Edit=secondary, View=default</td></tr>
+    <tr><td>F-003-03</td><td>Error Message Area (DTERR)</td><td>Output</td><td><code>&lt;Snackbar&gt;</code> + per-field <code>helperText</code></td><td><span class="tag-enhanced">Enhanced</span> Single error line &rarr; field-level inline errors + toast</td></tr>
+    <tr><td>F-003-04</td><td>Save Success (DTSAV)</td><td>Output, indicator</td><td><code>&lt;Alert severity="success"&gt;</code> via Snackbar</td><td>Toast notification</td></tr>
+    <tr><td>F-003-05</td><td>Item ID (DTITID)</td><td>Input/Output, 8-char</td><td><code>&lt;TextField&gt;</code> via react-hook-form Controller</td><td>Disabled in Edit/Display mode via <code>MODE_CONFIG</code></td></tr>
+    <tr><td>F-003-06</td><td>Item Name (DTITNM)</td><td>Input, 30-char</td><td><code>&lt;TextField&gt;</code> + Zod <code>.min(1).max(30)</code></td><td><span class="tag-enhanced">Enhanced</span> Client-side validation added</td></tr>
+    <tr><td>F-003-07</td><td>Description (DTITDS)</td><td>Input, 50-char</td><td><code>&lt;TextField&gt;</code> with <code>.max(50)</code></td><td>Same</td></tr>
+    <tr><td>F-003-08</td><td>Category Code (DTCTGY)</td><td>Input, 6-char</td><td><code>&lt;TextField&gt;</code> monospace, <code>maxLength: 6</code></td><td>Same</td></tr>
+    <tr><td>F-003-09</td><td>Category Name (DTCTNM)</td><td>Output (enriched)</td><td>Read-only <code>&lt;TextField&gt;</code> from <code>serverData.categoryName</code></td><td>Enriched from adapter lookup, display-only</td></tr>
+    <tr><td>F-003-10</td><td>Supplier Code (DTSUPL)</td><td>Input, 6-char</td><td><code>&lt;TextField&gt;</code> monospace</td><td>Same</td></tr>
+    <tr><td>F-003-11</td><td>Supplier Name (DTSUNM)</td><td>Output (enriched)</td><td>Read-only <code>&lt;TextField&gt;</code> from <code>serverData.supplierName</code></td><td>Enriched from adapter lookup</td></tr>
+    <tr><td>F-003-12</td><td>Warehouse Code (DTWHSE)</td><td>Input, 4-char</td><td><code>&lt;TextField&gt;</code> monospace</td><td>Same</td></tr>
+    <tr><td>F-003-13</td><td>Warehouse Name (DTWHNM)</td><td>Output (enriched)</td><td>Read-only <code>&lt;TextField&gt;</code> from <code>serverData.warehouseName</code></td><td>Enriched from adapter lookup</td></tr>
+    <tr><td>F-003-14</td><td>Qty On Hand (DTQTOH)</td><td>Input, numeric</td><td><code>&lt;TextField type="number"&gt;</code> with <code>min: 0</code></td><td>Numeric input with validation</td></tr>
+    <tr><td>F-003-15</td><td>Qty Allocated (DTQTAL)</td><td>Output (read-only)</td><td>Read-only <code>&lt;TextField&gt;</code> with info tooltip</td><td>System-calculated, not user-editable</td></tr>
+    <tr><td>F-003-16</td><td>Qty On Order (DTQTOR)</td><td>Output (read-only)</td><td>Read-only <code>&lt;TextField&gt;</code> with info tooltip</td><td>System-calculated</td></tr>
+    <tr><td>F-003-17</td><td>Reorder Point (DTROPL)</td><td>Input, numeric</td><td><code>&lt;TextField type="number"&gt;</code></td><td>Same</td></tr>
+    <tr><td>F-003-18</td><td>Reorder Quantity (DTROQT)</td><td>Input, numeric</td><td>Present in DTO, not in current form layout</td><td>Field available but not rendered on screen</td></tr>
+    <tr><td>F-003-19</td><td>Unit Cost (DTUNCS)</td><td>Input, decimal 9,2</td><td><code>&lt;TextField type="number" step="0.01"&gt;</code></td><td>Decimal step input</td></tr>
+    <tr><td>F-003-20</td><td>Unit Price (DTUNPR)</td><td>Input, decimal 9,2</td><td><code>&lt;TextField&gt;</code> + Zod <code>refine(price &ge; cost)</code></td><td><span class="tag-enhanced">Enhanced</span> Client-side cross-field validation (BR-045)</td></tr>
+    <tr><td>F-003-21</td><td>Gross Margin % (DTMRGN)</td><td>Output, derived ALG-001</td><td>Computed live: <code>((price-cost)/price)*100</code> with color</td><td><span class="tag-enhanced">Enhanced</span> Live-updating + color indicator (green &ge;20%, yellow &ge;0%, red &lt;0%)</td></tr>
+    <tr><td>F-003-22</td><td>Status (DTSTAT)</td><td>Output</td><td>Read-only <code>&lt;TextField&gt;</code></td><td>Same</td></tr>
+    <tr><td>&mdash;</td><td>F3=Cancel / F12=Return</td><td>Function Keys</td><td>Cancel / Back to List Button</td><td>Explicit buttons replace F-keys</td></tr>
+    <tr><td>&mdash;</td><td>Enter=Save</td><td>Function Key</td><td>Save Button with loading spinner</td><td>Click-to-save with <code>isSubmitting</code> state</td></tr>
+    <tr><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>Edit This Item Button (View mode only)</td><td><span class="tag-new">New</span> Inline mode switch from Display &rarr; Edit</td></tr>
+  </tbody>
+</table>
+
+<div class="paradigm">
+  <strong>Interaction Paradigm Shift:</strong> The legacy display file used a single record format with conditional field attributes (INPUT/OUTPUT based on mode indicator). The React version uses Zod schema validation at the form level (client-side), <code>react-hook-form</code> for state management, and the same component renders all three modes (Add/Edit/Display) with field-level disable states controlled by <code>MODE_CONFIG</code>. Gross margin is computed live as the user types (not on Enter).
+</div>
+
+<!-- ==================== SECTION 5: SCR-005 EXIT ==================== -->
+<h1 class="page-break">5. SCR-005: Exit Confirmation &mdash; Field-Level Comparison</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field ID</th>
+      <th>AS/400 DSPF Field</th>
+      <th>Type</th>
+      <th>React Equivalent</th>
+      <th>UI Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>F-005-01</td><td>Screen Title</td><td>Output</td><td><code>&lt;Typography variant="h5"&gt;</code> "Exit Application?"</td><td>Centered modal-style card</td></tr>
+    <tr><td>F-005-02</td><td>Exit Prompt (BR-005)</td><td>Output</td><td><code>&lt;Typography&gt;</code> description text</td><td>Descriptive warning text with icon</td></tr>
+    <tr><td>&mdash;</td><td>Enter=Confirm / F12=Cancel</td><td>Function Keys</td><td>Confirm Exit + Cancel Buttons</td><td><span class="tag-key">Key change</span> Function keys &rarr; explicit styled action buttons</td></tr>
+  </tbody>
+</table>
+
+<div class="paradigm">
+  <strong>Interaction Paradigm Shift:</strong> The legacy exit confirmation was a simple Y/N prompt on the green screen. The React version renders a full-screen glassmorphic modal with animated background, a Logout icon, and explicit button actions with hover effects.
+</div>
+
+<!-- ==================== SECTION 6: SCR-006 REORDER REPORT ==================== -->
+<h1>6. SCR-006: Reorder Report &mdash; Field-Level Comparison</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field ID</th>
+      <th>AS/400 DSPF Field</th>
+      <th>Type</th>
+      <th>React Equivalent</th>
+      <th>UI Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>F-006-01</td><td>Screen Title</td><td>Output</td><td><code>AppLayout title="Reorder Report"</code></td><td>Layout header with subtitle</td></tr>
+    <tr><td>F-006-02</td><td>Item ID (RPITID)</td><td>Output</td><td><code>&lt;TableCell&gt;</code> monospace, indigo</td><td>Same</td></tr>
+    <tr><td>F-006-03</td><td>Item Name (RPITNM)</td><td>Output</td><td><code>&lt;TableCell&gt;</code> bold</td><td>Same</td></tr>
+    <tr><td>F-006-04</td><td>Category (RPCTGY)</td><td>Output</td><td><code>&lt;Chip&gt;</code> badge</td><td>Pill badge style</td></tr>
+    <tr><td>F-006-05</td><td>Qty On Hand (RPQTOH)</td><td>Output, numeric</td><td><code>&lt;TableCell&gt;</code> right-aligned, locale formatted</td><td>Thousands separators</td></tr>
+    <tr><td>F-006-06</td><td>Reorder Point (RPROPL)</td><td>Output, numeric</td><td><code>&lt;TableCell&gt;</code> right-aligned</td><td>Same</td></tr>
+    <tr><td>F-006-07</td><td>Shortage Qty (RPSHRT)</td><td>Output, derived ALG-002</td><td><code>&lt;TableCell&gt;</code> red bold, right-aligned</td><td><span class="tag-enhanced">Enhanced</span> Color-coded red for urgency</td></tr>
+    <tr><td>F-006-08</td><td>Supplier Code (RPSUPL)</td><td>Output</td><td><code>&lt;TableCell&gt;</code> monospace</td><td>Same</td></tr>
+    <tr><td>F-006-09</td><td>Repl. Value (RPRVAL)</td><td>Output, derived ALG-003</td><td><code>&lt;TableCell&gt;</code> with $ + locale currency</td><td><span class="tag-enhanced">Enhanced</span> Currency formatting</td></tr>
+    <tr><td>F-006-10</td><td>Summary Totals (RPTCNT, RPTVAL)</td><td>Output, footer</td><td>Two <code>&lt;Card&gt;</code> stat summary cards with gradient icons</td><td><span class="tag-enhanced">Enhanced</span> Summary line &rarr; visual KPI cards</td></tr>
+    <tr><td>F-006-11</td><td>Warehouse Filter (RPWHSE)</td><td>Input, 4-char</td><td><code>&lt;TextField&gt;</code> with placeholder "All warehouses"</td><td>Descriptive placeholder</td></tr>
+    <tr><td>F-006-12</td><td>Category Filter (RPCTGY)</td><td>Input, 6-char</td><td><code>&lt;TextField&gt;</code> with placeholder "All categories"</td><td>Descriptive placeholder</td></tr>
+    <tr><td>&mdash;</td><td>F5=Refresh / F6=Print</td><td>Function Keys</td><td>Refresh + Print Report Buttons</td><td>Explicit buttons</td></tr>
+    <tr><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>Urgency column: Critical / High / Low <code>&lt;Chip&gt;</code></td><td><span class="tag-new">New</span> Urgency indicator derived from shortage ratio</td></tr>
+    <tr><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>Client-side sort by shortage descending (DT-008)</td><td><span class="tag-new">New</span> Items sorted by urgency in frontend</td></tr>
+  </tbody>
+</table>
+
+<div class="paradigm">
+  <strong>Interaction Paradigm Shift:</strong> The legacy INVRPTR report was a static print-oriented subfile. The React version adds interactive filter controls, live refresh, visual KPI summary cards, an urgency classification column derived from shortage-to-reorder-point ratio, and client-side sorting by severity &mdash; none of which existed in the original display file.
+</div>
+
+<!-- ==================== SECTION 7: CROSS-CUTTING SUMMARY ==================== -->
+<h1 class="page-break">7. Cross-Cutting Differences Summary</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 18%;">Aspect</th>
+      <th style="width: 41%;">AS/400 Display File (DSPF)</th>
+      <th style="width: 41%;">React Frontend</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Rendering</td><td>Server-rendered 5250 terminal stream, 24&times;80 fixed character grid</td><td>Client-side SPA, responsive Material UI grid with CSS flexbox/grid</td></tr>
+    <tr><td>Navigation</td><td>Function keys (F3, F5, F6, F12) + typed selection codes</td><td>React Router v6 + clickable buttons / navigation cards</td></tr>
+    <tr><td>Input Model</td><td>Typed codes per field, Enter to submit all fields at once</td><td>Individual form controls, click/type with live validation</td></tr>
+    <tr><td>Validation</td><td>Server-side only (RPG program logic after Enter)</td><td>Dual: client-side Zod schema validation + server-side Spring validator</td></tr>
+    <tr><td>Error Display</td><td>Single error message line at fixed screen row position</td><td>Per-field inline helperText errors + floating Snackbar toasts</td></tr>
+    <tr><td>List Actions</td><td>"Op" column: type 2/4/5 next to rows, Enter to batch-process</td><td>Per-row icon buttons (Edit/View/Delete) with immediate async execution</td></tr>
+    <tr><td>Computed Fields</td><td>Calculated server-side, refreshed on Enter</td><td>Live-updating on keystroke (e.g., ALG-001 gross margin)</td></tr>
+    <tr><td>Styling</td><td>Green-on-black monochrome, fixed-width font</td><td>Dark glassmorphic theme, gradient icons, animations, color-coded status chips</td></tr>
+    <tr><td>State Management</td><td>Stateful server session (RPG program call stack)</td><td>Stateless REST API + client-side React state (useState / react-hook-form)</td></tr>
+    <tr><td>Printing</td><td>OVRPRTF &rarr; spool file &rarr; output queue</td><td>HTTP POST to print endpoint &rarr; backend generates spool</td></tr>
+    <tr><td>List/Subfile</td><td>SFL/SFLCTL record formats with SFLSIZ/SFLPAG paging</td><td><code>Array.map()</code> into <code>&lt;Table&gt;</code> rows, unlimited scroll</td></tr>
+    <tr><td>New Features</td><td>&mdash;</td><td>Urgency indicators, live margin color, skeleton loading states, responsive layout, inline mode-switch button, KPI summary cards</td></tr>
+  </tbody>
+</table>
+
+<!-- ==================== SECTION 8: BUSINESS RULE PRESERVATION ==================== -->
+<h1>8. Business Rule Preservation Matrix</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Rule ID</th>
+      <th>Description</th>
+      <th>Legacy Location</th>
+      <th>Modern Location</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>BR-002&ndash;007</td><td>Menu option routing &amp; validation (DT-001)</td><td>INVMNUR RPG + SCR-001 DSPF</td><td>InventoryMenu.tsx + InventoryMenuController.java</td><td>&#10003; Preserved</td></tr>
+    <tr><td>BR-008&ndash;022</td><td>List browse, filter, action dispatch (DT-002/003)</td><td>INVLSTR RPG + SCR-002 SFL</td><td>InventoryList.tsx + InventoryListController.java</td><td>&#10003; Preserved</td></tr>
+    <tr><td>BR-036&ndash;048</td><td>Field validation: ID, name, codes, price&ge;cost (DT-005)</td><td>INVDTLR RPG logic</td><td>InventoryItemValidator.java + Zod schema in InventoryItemDetail.tsx</td><td>&#10003; Preserved (dual layer)</td></tr>
+    <tr><td>ALG-001</td><td>Gross margin: (price&minus;cost)/price&times;100</td><td>INVDTLR RPG CALC</td><td>InventoryItemService.calculateMargin() + client-side in InventoryItemDetail.tsx</td><td>&#10003; Preserved</td></tr>
+    <tr><td>ALG-002</td><td>Shortage: max(0, reorderPoint&minus;qtyOnHand)</td><td>INVRPTR RPG CALC</td><td>ReorderReportService.calculateShortage()</td><td>&#10003; Preserved</td></tr>
+    <tr><td>ALG-003</td><td>Replenishment value: shortage &times; unitCost</td><td>INVRPTR RPG CALC</td><td>ReorderReportService.calculateReplenishmentValue()</td><td>&#10003; Preserved</td></tr>
+    <tr><td>BR-049&ndash;051</td><td>Create item: init alloc=0, onOrder=0, status=ACTIVE</td><td>INVDTLR RPG WRITE</td><td>InventoryItemService.createItem()</td><td>&#10003; Preserved</td></tr>
+    <tr><td>BR-016&ndash;020</td><td>Soft delete: block if allocated, ACTIVE&rarr;INACTIVE</td><td>INVLSTR RPG</td><td>InventoryItemService.softDeleteItem() + STM-001</td><td>&#10003; Preserved</td></tr>
+    <tr><td>STM-001</td><td>State machine: T-001/T-002/T-003 transitions</td><td>Implicit in RPG program flow</td><td>InventoryItemStateMachine.java + InventoryItemEntity methods</td><td>&#10003; Preserved (formalized)</td></tr>
+    <tr><td>BR-055&ndash;070</td><td>Reorder eligibility, aggregation, 200-item cap</td><td>INVRPTR RPG</td><td>ReorderReportService.aggregateReorderData()</td><td>&#10003; Preserved</td></tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  TRTCT004 Inventory Management &mdash; Display File vs Frontend Comparison Report &mdash; Generated April 28, 2026
+</div>
+
+</body>
+</html>

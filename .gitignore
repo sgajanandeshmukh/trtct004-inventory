@@ -1,0 +1,28 @@
+# Maven build output
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node dependencies (frontend)
+src/main/frontend/node_modules/
+
+# Frontend build output
+src/main/frontend/dist/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
