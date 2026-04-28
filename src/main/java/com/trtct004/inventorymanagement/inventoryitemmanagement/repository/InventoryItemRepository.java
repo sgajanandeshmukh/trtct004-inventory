@@ -47,4 +47,40 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItemEnti
 
     /** Check item name uniqueness for add mode (BR-037 — item ID uniqueness is PK). */
     boolean existsByItemName(String itemName);
+
+    long countByStatus(com.trtct004.inventorymanagement.inventoryitemmanagement.entity.InventoryItemStatus status);
+
+    @Query("SELECT COUNT(i) FROM InventoryItemEntity i " +
+           "WHERE i.status = com.trtct004.inventorymanagement.inventoryitemmanagement.entity.InventoryItemStatus.ACTIVE " +
+           "AND i.reorderPoint > 0 AND i.quantityOnHand <= i.reorderPoint")
+    long countItemsBelowReorderPoint();
+
+    @Query("SELECT COUNT(i) FROM InventoryItemEntity i " +
+           "WHERE i.status = com.trtct004.inventorymanagement.inventoryitemmanagement.entity.InventoryItemStatus.ACTIVE " +
+           "AND i.quantityOnHand = 0")
+    long countOutOfStockItems();
+
+    @Query("SELECT COALESCE(SUM(i.quantityOnHand * i.unitCost), 0) FROM InventoryItemEntity i " +
+           "WHERE i.status = com.trtct004.inventorymanagement.inventoryitemmanagement.entity.InventoryItemStatus.ACTIVE")
+    java.math.BigDecimal calculateTotalInventoryValue();
+
+    @Query("SELECT COALESCE(AVG(CASE WHEN i.unitPrice > 0 THEN ((i.unitPrice - i.unitCost) / i.unitPrice) * 100 ELSE 0 END), 0) " +
+           "FROM InventoryItemEntity i " +
+           "WHERE i.status = com.trtct004.inventorymanagement.inventoryitemmanagement.entity.InventoryItemStatus.ACTIVE")
+    java.math.BigDecimal calculateAverageMargin();
+
+    @Query("SELECT i.categoryCode, COUNT(i), COALESCE(SUM(i.quantityOnHand * i.unitCost), 0) " +
+           "FROM InventoryItemEntity i " +
+           "WHERE i.status = com.trtct004.inventorymanagement.inventoryitemmanagement.entity.InventoryItemStatus.ACTIVE " +
+           "GROUP BY i.categoryCode ORDER BY i.categoryCode")
+    List<Object[]> getCategoryDistribution();
+
+    @Query("SELECT i.warehouseCode, COUNT(i), COALESCE(SUM(i.quantityOnHand), 0) " +
+           "FROM InventoryItemEntity i " +
+           "WHERE i.status = com.trtct004.inventorymanagement.inventoryitemmanagement.entity.InventoryItemStatus.ACTIVE " +
+           "GROUP BY i.warehouseCode ORDER BY i.warehouseCode")
+    List<Object[]> getWarehouseDistribution();
+
+    @Query("SELECT i.status, COUNT(i) FROM InventoryItemEntity i GROUP BY i.status")
+    List<Object[]> getStatusDistribution();
 }

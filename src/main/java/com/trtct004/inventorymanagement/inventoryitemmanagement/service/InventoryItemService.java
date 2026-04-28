@@ -37,18 +37,21 @@ public class InventoryItemService {
     private final CategoryReferencePort categoryReferenceAdapter;
     private final SupplierReferencePort supplierReferenceAdapter;
     private final WarehouseReferencePort warehouseReferenceAdapter;
+    private final InventoryTransactionService transactionService;
 
     public InventoryItemService(
             InventoryItemRepository inventoryItemRepository,
             InventoryItemValidatorPort inventoryItemValidator,
             CategoryReferencePort categoryReferenceAdapter,
             SupplierReferencePort supplierReferenceAdapter,
-            WarehouseReferencePort warehouseReferenceAdapter) {
+            WarehouseReferencePort warehouseReferenceAdapter,
+            InventoryTransactionService transactionService) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryItemValidator = inventoryItemValidator;
         this.categoryReferenceAdapter = categoryReferenceAdapter;
         this.supplierReferenceAdapter = supplierReferenceAdapter;
         this.warehouseReferenceAdapter = warehouseReferenceAdapter;
+        this.transactionService = transactionService;
     }
 
     /**
@@ -106,7 +109,9 @@ public class InventoryItemService {
         // BR-050: New item status = ACTIVE
         entity.setStatus(InventoryItemStatus.ACTIVE);
         entity.setLastUpdatedDate(LocalDate.now());
-        return inventoryItemRepository.save(entity);
+        InventoryItemEntity saved = inventoryItemRepository.save(entity);
+        transactionService.logItemCreated(saved.getItemId(), saved.getQuantityOnHand() != null ? saved.getQuantityOnHand() : 0);
+        return saved;
     }
 
     /**
@@ -115,6 +120,8 @@ public class InventoryItemService {
     public InventoryItemEntity updateItem(InventoryItemRequestDto request) {
         InventoryItemEntity entity = inventoryItemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new IllegalStateException("Item not found: " + request.getItemId()));
+
+        int oldQty = entity.getQuantityOnHand() != null ? entity.getQuantityOnHand() : 0;
 
         entity.setItemName(request.getItemName());
         entity.setItemDescription(request.getItemDescription());
@@ -128,7 +135,13 @@ public class InventoryItemService {
         entity.setWarehouseCode(request.getWarehouseCode());
         entity.setLastUpdatedDate(LocalDate.now());
 
-        return inventoryItemRepository.save(entity);
+        InventoryItemEntity saved = inventoryItemRepository.save(entity);
+        transactionService.logItemUpdated(saved.getItemId(), saved.getQuantityOnHand() != null ? saved.getQuantityOnHand() : 0);
+        int newQty = saved.getQuantityOnHand() != null ? saved.getQuantityOnHand() : 0;
+        if (oldQty != newQty) {
+            transactionService.logQuantityAdjustment(saved.getItemId(), oldQty, newQty);
+        }
+        return saved;
     }
 
     /**
@@ -186,9 +199,11 @@ public class InventoryItemService {
         }
 
         // BR-020: Set status to Inactive (STM-001 T-001)
+        String fromStatus = item.getStatus().name();
         item.softDelete();
         item.setLastUpdatedDate(LocalDate.now());
         inventoryItemRepository.save(item);
+        transactionService.logStatusChange(itemId, fromStatus, item.getStatus().name());
     }
 
     /**

@@ -11,6 +11,9 @@ import InventoryList from './pages/InventoryList';
 import InventoryItemDetail from './pages/InventoryItemDetail';
 import ReorderReport from './pages/ReorderReport';
 import ExitConfirmation from './pages/ExitConfirmation';
+import Dashboard from './pages/Dashboard';
+import TransactionHistory from './pages/TransactionHistory';
+import BulkOperations from './pages/BulkOperations';
 
 const theme = createTheme({
   palette: {
@@ -243,10 +246,13 @@ const App: React.FC = () => {
       {globalStyles}
       <BrowserRouter>
         <Routes>
-          {/* Default redirect to main menu — BPF-001 entry point */}
-          <Route path="/" element={<Navigate to="/inventory/menu" replace />} />
+          {/* Default redirect to Dashboard — FR-001 entry point */}
+          <Route path="/" element={<Navigate to="/inventory/dashboard" replace />} />
 
-          {/* SCR-001: Inventory Management Main Menu */}
+          {/* FR-001: Dashboard — Inventory Intelligence */}
+          <Route path="/inventory/dashboard" element={<Dashboard />} />
+
+          {/* SCR-001: Inventory Management Main Menu (legacy) */}
           <Route path="/inventory/menu" element={<InventoryMenu />} />
 
           {/* SCR-005: Exit Confirmation */}
@@ -262,8 +268,14 @@ const App: React.FC = () => {
           {/* SCR-006: Inventory Reorder Report */}
           <Route path="/inventory/report/reorder" element={<ReorderReport />} />
 
+          {/* FR-005: Transaction History — Audit Trail */}
+          <Route path="/inventory/transactions" element={<TransactionHistory />} />
+
+          {/* FR-008: Bulk Operations — CSV export/import, mass status update */}
+          <Route path="/inventory/bulk" element={<BulkOperations />} />
+
           {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/inventory/menu" replace />} />
+          <Route path="*" element={<Navigate to="/inventory/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

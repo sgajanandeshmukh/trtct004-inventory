@@ -176,4 +176,119 @@ export const reorderApi = {
     apiClient.post('/api/inventory/report/reorder/print', null, { params }),
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Dashboard API — FR-001
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface DashboardKpis {
+  totalItems: number;
+  activeItems: number;
+  inactiveItems: number;
+  belowReorderPoint: number;
+  outOfStock: number;
+  totalInventoryValue: number;
+  averageMarginPercent: number;
+  inventoryHealthScore: number;
+}
+
+export interface CategoryDistribution {
+  categoryCode: string;
+  itemCount: number;
+  totalValue: number;
+}
+
+export interface WarehouseDistribution {
+  warehouseCode: string;
+  itemCount: number;
+  totalQuantity: number;
+}
+
+export interface StatusDistribution {
+  status: string;
+  count: number;
+}
+
+export interface TransactionRecord {
+  sequenceId: number;
+  transactionId: number;
+  itemId: string;
+  transactionType: string;
+  quantity: number;
+  transactionDate: string;
+  userId: string;
+  reference: string;
+}
+
+export interface DashboardResponse {
+  kpis: DashboardKpis;
+  categoryDistribution: CategoryDistribution[];
+  warehouseDistribution: WarehouseDistribution[];
+  statusDistribution: StatusDistribution[];
+  recentActivity: TransactionRecord[];
+  recentActivityCount: number;
+}
+
+export const dashboardApi = {
+  getDashboard: (): Promise<AxiosResponse<DashboardResponse>> =>
+    apiClient.get('/api/inventory/dashboard'),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Transaction History API — FR-005
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface TransactionSearchResponse {
+  transactions: TransactionRecord[];
+  totalCount: number;
+  noRecordsFound: boolean;
+}
+
+export const transactionApi = {
+  search: (params: { itemId?: string; transactionType?: string; startDate?: string; endDate?: string }): Promise<AxiosResponse<TransactionSearchResponse>> =>
+    apiClient.get('/api/inventory/transactions', { params }),
+
+  getItemHistory: (itemId: string): Promise<AxiosResponse<{ itemId: string; transactions: TransactionRecord[]; totalCount: number }>> =>
+    apiClient.get(`/api/inventory/transactions/item/${itemId}`),
+
+  getRecent: (limit?: number): Promise<AxiosResponse<{ transactions: TransactionRecord[]; totalCount: number }>> =>
+    apiClient.get('/api/inventory/transactions/recent', { params: { limit: limit || 20 } }),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bulk Operations API — FR-008
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface BulkStatusResult {
+  success: boolean;
+  successCount: number;
+  failCount: number;
+  failures: string[];
+  totalProcessed: number;
+}
+
+export interface BulkImportResult {
+  success: boolean;
+  created: number;
+  updated: number;
+  failed: number;
+  errors: string[];
+}
+
+export const bulkApi = {
+  exportCsv: (categoryCode?: string, nameFilter?: string): Promise<AxiosResponse<Blob>> =>
+    apiClient.get('/api/inventory/bulk/export', {
+      params: { categoryCode, nameFilter },
+      responseType: 'blob',
+    }),
+
+  bulkStatusUpdate: (itemIds: string[], targetStatus: string): Promise<AxiosResponse<BulkStatusResult>> =>
+    apiClient.post('/api/inventory/bulk/status-update', { itemIds, targetStatus }),
+
+  importCsv: (csvContent: string): Promise<AxiosResponse<BulkImportResult>> =>
+    apiClient.post('/api/inventory/bulk/import', { csvContent }),
+
+  downloadTemplate: (): Promise<AxiosResponse<Blob>> =>
+    apiClient.get('/api/inventory/bulk/template', { responseType: 'blob' }),
+};
+
 export default apiClient;

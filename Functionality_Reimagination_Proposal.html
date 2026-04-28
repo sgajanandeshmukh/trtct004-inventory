@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Functionality Reimagination Proposal — WorkStream Inventory Management</title>
+<style>
+  @page { size: A4 portrait; margin: 18mm 16mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; font-size: 10.5pt; line-height: 1.55; color: #1e293b; background: #ffffff; }
+
+  /* Cover Page */
+  .cover { page-break-after: always; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 95vh; text-align: center; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #312e81 100%); color: #fff; padding: 60px 40px; border-radius: 0; }
+  .cover-logo { font-size: 14pt; letter-spacing: 6px; text-transform: uppercase; color: #818cf8; margin-bottom: 8px; font-weight: 600; }
+  .cover h1 { font-size: 28pt; font-weight: 700; margin: 20px 0 10px; line-height: 1.2; }
+  .cover h2 { font-size: 16pt; font-weight: 300; color: #c7d2fe; margin-bottom: 30px; }
+  .cover-meta { font-size: 10pt; color: #94a3b8; line-height: 1.8; margin-top: 40px; }
+  .cover-meta strong { color: #e2e8f0; }
+  .cover-line { width: 80px; height: 3px; background: linear-gradient(90deg, #818cf8, #6366f1); margin: 20px auto; border-radius: 2px; }
+  .cover-badge { display: inline-block; padding: 6px 20px; border: 1px solid #818cf8; border-radius: 20px; font-size: 9pt; color: #c7d2fe; letter-spacing: 2px; text-transform: uppercase; margin-top: 30px; }
+
+  /* TOC */
+  .toc { page-break-after: always; padding: 40px 0; }
+  .toc h2 { font-size: 18pt; color: #1e3a5f; margin-bottom: 25px; border-bottom: 2px solid #6366f1; padding-bottom: 8px; }
+  .toc-list { list-style: none; counter-reset: toc-counter; }
+  .toc-list li { padding: 8px 0; border-bottom: 1px dotted #cbd5e1; font-size: 11pt; display: flex; justify-content: space-between; }
+  .toc-list li span.num { color: #6366f1; font-weight: 700; min-width: 30px; }
+  .toc-list li span.title { flex: 1; }
+  .toc-list li span.page { color: #64748b; font-size: 10pt; }
+
+  /* Section Headings */
+  h2.section { font-size: 16pt; color: #1e3a5f; margin: 35px 0 12px; padding: 8px 0 6px; border-bottom: 2px solid #6366f1; page-break-after: avoid; }
+  h3.sub { font-size: 12pt; color: #312e81; margin: 22px 0 8px; font-weight: 600; page-break-after: avoid; }
+  h4.detail { font-size: 10.5pt; color: #475569; margin: 14px 0 6px; font-weight: 600; }
+
+  /* Paragraphs */
+  p { margin: 6px 0 10px; text-align: justify; }
+  .lead { font-size: 11.5pt; color: #334155; font-weight: 400; margin-bottom: 16px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 9.5pt; }
+  th { background: #1e3a5f; color: #fff; padding: 8px 10px; text-align: left; font-weight: 600; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  tr:nth-child(even) { background: #f8fafc; }
+  tr:hover { background: #f1f5f9; }
+
+  /* Tags */
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 8pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin: 1px 2px; }
+  .tag-new { background: #dcfce7; color: #166534; }
+  .tag-enhance { background: #dbeafe; color: #1e40af; }
+  .tag-reimagine { background: #f3e8ff; color: #6b21a8; }
+  .tag-phase1 { background: #fef3c7; color: #92400e; }
+  .tag-phase2 { background: #fed7aa; color: #9a3412; }
+  .tag-phase3 { background: #fecaca; color: #991b1b; }
+  .tag-high { background: #fee2e2; color: #991b1b; }
+  .tag-med { background: #fef9c3; color: #854d0e; }
+  .tag-low { background: #e0f2fe; color: #075985; }
+  .tag-infra { background: #f1f5f9; color: #475569; border: 1px solid #94a3b8; }
+  .tag-scoped { background: #fae8ff; color: #86198f; }
+
+  /* Cards */
+  .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 18px; margin: 12px 0; background: #fafbff; page-break-inside: avoid; }
+  .card-header { display: flex; align-items: center; margin-bottom: 8px; }
+  .card-id { background: #6366f1; color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 9pt; font-weight: 700; margin-right: 10px; }
+  .card-title { font-size: 11.5pt; font-weight: 600; color: #1e293b; }
+  .card-body { font-size: 10pt; color: #475569; }
+
+  /* Metric boxes */
+  .metrics { display: flex; gap: 12px; margin: 14px 0 20px; flex-wrap: wrap; }
+  .metric { flex: 1; min-width: 130px; background: linear-gradient(135deg, #f0f4ff, #e8ecff); border: 1px solid #c7d2fe; border-radius: 8px; padding: 14px; text-align: center; }
+  .metric-value { font-size: 22pt; font-weight: 700; color: #4338ca; }
+  .metric-label { font-size: 8pt; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* Flow diagram */
+  .flow { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 12px 0; font-family: 'Consolas', 'Courier New', monospace; font-size: 9pt; line-height: 1.6; white-space: pre; overflow-x: auto; }
+
+  /* Lists */
+  ul, ol { margin: 6px 0 12px 20px; }
+  li { margin: 3px 0; }
+
+  /* Callout */
+  .callout { border-left: 4px solid #6366f1; background: #f0f4ff; padding: 12px 16px; margin: 12px 0; border-radius: 0 6px 6px 0; font-size: 10pt; }
+  .callout-warn { border-left-color: #f59e0b; background: #fffbeb; }
+  .callout-success { border-left-color: #10b981; background: #ecfdf5; }
+
+  /* Priority matrix */
+  .matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .matrix-cell { padding: 12px; border-radius: 6px; font-size: 9.5pt; }
+  .matrix-high-high { background: #fef2f2; border: 1px solid #fca5a5; }
+  .matrix-high-low { background: #fefce8; border: 1px solid #fde047; }
+  .matrix-low-high { background: #f0fdf4; border: 1px solid #86efac; }
+  .matrix-low-low { background: #f8fafc; border: 1px solid #e2e8f0; }
+
+  /* Footer */
+  .footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 8pt; color: #94a3b8; text-align: center; }
+
+  /* Page breaks */
+  .pb { page-break-before: always; }
+
+  /* Two-column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .two-col > div { min-width: 0; }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover">
+  <div class="cover-logo">WorkStream</div>
+  <div class="cover-line"></div>
+  <h1>Functionality Reimagination Proposal</h1>
+  <h2>Inventory Management Application</h2>
+  <div class="cover-line"></div>
+  <p style="max-width:520px; color:#cbd5e1; font-size:10.5pt; line-height:1.7;">
+    A forward-looking proposal to transform static AS/400 inventory management into an intelligent,
+    real-time, data-driven platform — unlocking capabilities that were impossible within the constraints
+    of legacy RPG green-screen architecture.
+  </p>
+  <div class="cover-meta">
+    <strong>Application:</strong> TRTCT004 — Inventory Management System<br>
+    <strong>Current Stack:</strong> Spring Boot 3.3 &middot; React 18 &middot; PostgreSQL 16<br>
+    <strong>Legacy Origin:</strong> IBM AS/400 RPG IV &middot; DB2/400 &middot; DSPF 5250<br>
+    <strong>Date:</strong> April 28, 2026<br>
+    <strong>Classification:</strong> Internal — Strategic Planning
+  </div>
+  <div class="cover-badge">Proposal &middot; Version 1.1 &middot; Scope Revised</div>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ul class="toc-list">
+    <li><span class="num">1</span> <span class="title">Executive Summary</span></li>
+    <li><span class="num">2</span> <span class="title">Current State Assessment</span></li>
+    <li><span class="num">3</span> <span class="title">Reimagination Vision &amp; Principles</span></li>
+    <li><span class="num">4</span> <span class="title">Proposed Functionality Reimaginations</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.1 &nbsp;Real-Time Inventory Intelligence Dashboard</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.2 &nbsp;Predictive Reorder &amp; Demand Forecasting</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.3 &nbsp;Barcode / QR Code Scanning Integration</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.4 &nbsp;Multi-Warehouse Transfer Management</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.5 &nbsp;Complete Audit Trail &amp; Transaction History</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.6 &nbsp;ABC Inventory Classification &amp; Analytics</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.7 &nbsp;Automated Alerts &amp; Notification Engine</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.8 &nbsp;Bulk Operations &amp; Import/Export</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.9 &nbsp;Supplier Lead Time &amp; Goods Receipt (Scoped)</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.10 Mobile-First Warehouse Floor Application</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.11 Cycle Counting &amp; Physical Inventory</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.12 Lot Tracking, Expiry &amp; Serial Number Management</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.13 Inventory Valuation &amp; Costing Methods</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:40px;color:#64748b;"><em>Cross-Cutting Infrastructure Prerequisites</em></span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.14 Role-Based Access Control (Infrastructure)</span></li>
+    <li><span class="num"></span> <span class="title" style="padding-left:20px;">4.15 API Documentation &amp; Inventory Webhooks (Infrastructure)</span></li>
+    <li><span class="num">5</span> <span class="title">Implementation Roadmap</span></li>
+    <li><span class="num">6</span> <span class="title">Impact Analysis &amp; Priority Matrix</span></li>
+    <li><span class="num">7</span> <span class="title">Technical Architecture Evolution</span></li>
+    <li><span class="num">8</span> <span class="title">Risk Assessment &amp; Mitigation</span></li>
+    <li><span class="num">9</span> <span class="title">Success Metrics &amp; KPIs</span></li>
+    <li><span class="num">10</span> <span class="title">Summary &amp; Recommendation</span></li>
+  </ul>
+</div>
+
+<!-- ==================== 1. EXECUTIVE SUMMARY ==================== -->
+<h2 class="section">1. Executive Summary</h2>
+
+<p class="lead">
+  The TRTCT004 Inventory Management System has been successfully migrated from IBM AS/400 RPG to a modern
+  Spring Boot + React stack. While this migration preserves all 70+ legacy business rules, it only scratches
+  the surface of what a modern platform can deliver. This proposal outlines <strong>12 inventory-domain functionality
+  reimaginations</strong> plus <strong>2 cross-cutting infrastructure prerequisites</strong> that transform inventory management from a transactional record-keeping system into
+  an <strong>intelligent, predictive, and connected</strong> platform — all strictly within the scope of inventory management.
+</p>
+
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-value">12</div>
+    <div class="metric-label">Inventory Reimaginations</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">2</div>
+    <div class="metric-label">Infrastructure Prerequisites</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">3</div>
+    <div class="metric-label">Implementation Phases</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">8</div>
+    <div class="metric-label">New Screens</div>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>Core Thesis:</strong> The legacy system asked <em>"What do we have?"</em> — the reimagined system answers
+  <em>"What should we have, when, where, and why?"</em>  Moving from reactive record-keeping to proactive
+  inventory intelligence.
+</div>
+
+<table>
+  <tr>
+    <th style="width:25%;">Dimension</th>
+    <th style="width:37%;">Current State (Migrated)</th>
+    <th style="width:38%;">Reimagined State (Proposed)</th>
+  </tr>
+  <tr>
+    <td><strong>Inventory Visibility</strong></td>
+    <td>Manual browse with basic category/name filters</td>
+    <td>Real-time dashboard with KPIs, trends, and heatmaps</td>
+  </tr>
+  <tr>
+    <td><strong>Reorder Decision</strong></td>
+    <td>Static reorder point comparison (ALG-002)</td>
+    <td>ML-driven demand forecasting with seasonal adjustment</td>
+  </tr>
+  <tr>
+    <td><strong>Data Entry</strong></td>
+    <td>Manual form-based item creation</td>
+    <td>Barcode/QR scan, bulk import, supplier auto-feed</td>
+  </tr>
+  <tr>
+    <td><strong>Warehouse Ops</strong></td>
+    <td>Single-warehouse view per item</td>
+    <td>Multi-warehouse transfer, mobile floor app</td>
+  </tr>
+  <tr>
+    <td><strong>Audit &amp; Compliance</strong></td>
+    <td>Transaction table exists but unwritten (INVTRN)</td>
+    <td>Full audit trail, cycle counting, lot tracking</td>
+  </tr>
+  <tr>
+    <td><strong>Integration</strong></td>
+    <td>Standalone application, static reference adapters</td>
+    <td>Database-backed reference adapters, API documentation, inventory event webhooks</td>
+  </tr>
+</table>
+
+<!-- ==================== 2. CURRENT STATE ASSESSMENT ==================== -->
+<h2 class="section pb">2. Current State Assessment</h2>
+
+<h3 class="sub">2.1 What Has Been Achieved</h3>
+<p>The migration from AS/400 to Spring Boot + React has delivered a functionally equivalent modern application:</p>
+
+<table>
+  <tr><th>Aspect</th><th>Legacy (AS/400)</th><th>Current (Migrated)</th></tr>
+  <tr><td>Architecture</td><td>Monolithic RPG programs (PGM-001–004)</td><td>Hexagonal architecture with ports &amp; adapters</td></tr>
+  <tr><td>UI</td><td>6 DSPF green screens (5250 terminal)</td><td>6 React screens with glassmorphic dark theme</td></tr>
+  <tr><td>Data</td><td>DB2/400 physical files (PF/LF)</td><td>PostgreSQL 16 with JPA + Flyway migrations</td></tr>
+  <tr><td>State Management</td><td>Implicit in RPG indicators</td><td>Explicit state machine (STM-001) with EnumMap</td></tr>
+  <tr><td>Validation</td><td>RPG IF/ELSE chains</td><td>Dual-layer: Zod (frontend) + Spring validator (backend)</td></tr>
+  <tr><td>Business Rules</td><td>70+ rules embedded in RPG source</td><td>70+ rules preserved and traceable (BR-001 through BR-070)</td></tr>
+  <tr><td>Testing</td><td>Manual QA only</td><td>120 automated unit tests (JUnit 5 + Mockito + AssertJ)</td></tr>
+</table>
+
+<h3 class="sub">2.2 Current Functional Boundaries</h3>
+<p>The migrated application faithfully replicates — but does not extend — the following functional scope:</p>
+
+<table>
+  <tr><th>Screen</th><th>Function</th><th>Capabilities</th><th>Limitations</th></tr>
+  <tr>
+    <td>SCR-001</td><td>Main Menu</td>
+    <td>3-option navigation (Browse, Add, Reorder)</td>
+    <td>No dashboard, no at-a-glance metrics</td>
+  </tr>
+  <tr>
+    <td>SCR-002</td><td>Item List</td>
+    <td>Filter by category/name, Edit/View/Delete actions</td>
+    <td>200-row cap, no sorting, no export, no pagination</td>
+  </tr>
+  <tr>
+    <td>SCR-003</td><td>Item Detail</td>
+    <td>Add/Edit/Display modes, validation, margin calc</td>
+    <td>No history, no image, no related items, no attachments</td>
+  </tr>
+  <tr>
+    <td>SCR-004</td><td>Delete Confirm</td>
+    <td>Soft-delete with allocation check</td>
+    <td>No bulk delete, no undo capability</td>
+  </tr>
+  <tr>
+    <td>SCR-005</td><td>Exit Confirm</td>
+    <td>Session termination guard</td>
+    <td>Legacy pattern, unnecessary in web context</td>
+  </tr>
+  <tr>
+    <td>SCR-006</td><td>Reorder Report</td>
+    <td>Shortage calc, replenishment value, filters</td>
+    <td>Static thresholds only, no forecasting, no auto-order</td>
+  </tr>
+</table>
+
+<h3 class="sub">2.3 Identified Gaps &amp; Unrealized Potential</h3>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">GAP-1</span>
+      <span class="card-title">Dormant Transaction Table</span>
+    </div>
+    <div class="card-body">
+      The INVTRN (inventory transaction log, DB-005) table was created in V1 migration with full schema — but no service, repository, or controller writes to it. This eliminates all audit capability.
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">GAP-2</span>
+      <span class="card-title">Static Reference Adapters</span>
+    </div>
+    <div class="card-body">
+      Category, Supplier, and Warehouse adapters use hardcoded static maps instead of querying the database tables (CTGMST, SUPLMST, WHSMST) that were seeded in V5 migration.
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">GAP-3</span>
+      <span class="card-title">No Inter-Warehouse Visibility</span>
+    </div>
+    <div class="card-body">
+      Each item is assigned to a single warehouse. There is no mechanism for warehouse-to-warehouse transfers, consolidated stock views, or optimal sourcing logic.
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">GAP-4</span>
+      <span class="card-title">Report Print Stub</span>
+    </div>
+    <div class="card-body">
+      ReportPrintAdapterProxy.spoolReport() is a stub. Legacy INVRPTR (PGM-004) printed physical spool files — this capability was not re-implemented, leaving reporting incomplete.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 3. REIMAGINATION VISION ==================== -->
+<h2 class="section pb">3. Reimagination Vision &amp; Principles</h2>
+
+<h3 class="sub">3.1 Vision Statement</h3>
+<div class="callout-success callout">
+  Transform WorkStream Inventory Management from a <strong>transactional record system</strong> into an
+  <strong>intelligent inventory platform</strong> that predicts demand, automates replenishment, enables
+  real-time warehouse operations, and provides actionable business intelligence — all while preserving the
+  70+ battle-tested business rules from the legacy system.
+</div>
+
+<h3 class="sub">3.2 Guiding Principles</h3>
+<table>
+  <tr><th style="width:5%;">#</th><th style="width:25%;">Principle</th><th>Description</th></tr>
+  <tr><td>P1</td><td><strong>Intelligence Over Entry</strong></td><td>Automate decisions that were previously manual. The system should recommend, not just record.</td></tr>
+  <tr><td>P2</td><td><strong>Real-Time Over Batch</strong></td><td>Replace legacy batch processing patterns with event-driven, real-time data flows.</td></tr>
+  <tr><td>P3</td><td><strong>Predictive Over Reactive</strong></td><td>Use historical data and algorithms to anticipate needs instead of responding to shortages after they occur.</td></tr>
+  <tr><td>P4</td><td><strong>Connected Over Isolated</strong></td><td>Break silos between inventory, suppliers, warehouses, and payroll systems through APIs and integrations.</td></tr>
+  <tr><td>P5</td><td><strong>Mobile Over Desk-Bound</strong></td><td>Bring inventory management to the warehouse floor with mobile-first experiences.</td></tr>
+  <tr><td>P6</td><td><strong>Auditable Over Opaque</strong></td><td>Every inventory movement must be traceable, compliant, and explainable.</td></tr>
+  <tr><td>P7</td><td><strong>Preserve &amp; Extend</strong></td><td>All 70+ existing business rules (BR-001 through BR-070) remain intact. New capabilities layer on top, never replace validated logic.</td></tr>
+</table>
+
+<!-- ==================== 4. PROPOSED FUNCTIONALITY REIMAGINATIONS ==================== -->
+<h2 class="section pb">4. Proposed Functionality Reimaginations</h2>
+
+<!-- FR-001 -->
+<h3 class="sub">4.1 Real-Time Inventory Intelligence Dashboard</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-001</span>
+    <span class="card-title">Replace static menu (SCR-001) with a live intelligence dashboard</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> SCR-001 (INVMNU display file) was a simple 3-option text menu — Browse, Add Item, Reorder Report. It provided zero visibility into inventory health on entry.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:30%;">Feature</th><th>Description</th><th style="width:12%;">Type</th></tr>
+  <tr><td>Inventory Health Score</td><td>Composite KPI (0–100) based on stock levels, aging, allocation ratios, and margin distribution</td><td><span class="tag tag-new">New</span></td></tr>
+  <tr><td>Stock Level Heatmap</td><td>Visual heatmap across warehouses showing overstocked (blue), optimal (green), low (yellow), critical (red) items</td><td><span class="tag tag-new">New</span></td></tr>
+  <tr><td>Trending Items Widget</td><td>Top 10 fastest-moving and slowest-moving items over configurable timeframes (7d, 30d, 90d)</td><td><span class="tag tag-new">New</span></td></tr>
+  <tr><td>Reorder Urgency Ticker</td><td>Live count of items below reorder point, segmented by urgency (critical/warning/watch)</td><td><span class="tag tag-enhance">Enhanced</span></td></tr>
+  <tr><td>Financial Summary</td><td>Total inventory value, total margin, cost breakdown by category — derived from existing ALG-001</td><td><span class="tag tag-enhance">Enhanced</span></td></tr>
+  <tr><td>Recent Activity Feed</td><td>Last 20 transactions — additions, edits, deletions, reorder events — pulled from INVTRN (once FR-005 activates it)</td><td><span class="tag tag-new">New</span></td></tr>
+</table>
+
+<p><strong>Technical Approach:</strong> New <code>DashboardService</code> aggregating data from existing <code>InventoryItemRepository</code> queries plus new aggregate SQL queries. React component using MUI charts (recharts or nivo) with WebSocket push for real-time updates.</p>
+
+<!-- FR-002 -->
+<h3 class="sub">4.2 Predictive Reorder &amp; Demand Forecasting</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-002</span>
+    <span class="card-title">Evolve static reorder points into ML-driven demand prediction</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> The reorder report (SCR-006) uses a simple threshold comparison: <code>quantityOnHand &le; reorderPoint</code> (BR-062). Reorder points and quantities are manually maintained per item — they never adapt to actual demand patterns.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:30%;">Feature</th><th>Description</th><th style="width:12%;">Type</th></tr>
+  <tr><td>Consumption Velocity Tracking</td><td>Calculate daily/weekly burn rate per item from transaction history. Replace static reorderPoint with dynamic safety stock levels.</td><td><span class="tag tag-reimagine">Reimagine</span></td></tr>
+  <tr><td>Seasonal Demand Curves</td><td>Identify seasonal patterns (quarterly, monthly) and adjust reorder timing proactively. Items ordered 2 weeks before predicted demand spike.</td><td><span class="tag tag-new">New</span></td></tr>
+  <tr><td>Lead Time Awareness</td><td>Factor supplier lead times into reorder calculations. Trigger reorder when <code>daysOfStockRemaining &lt; supplierLeadTimeDays</code>.</td><td><span class="tag tag-new">New</span></td></tr>
+  <tr><td>Economic Order Quantity (EOQ)</td><td>Calculate optimal order quantity using EOQ formula: <code>&radic;(2DS/H)</code> where D=annual demand, S=order cost, H=holding cost per unit.</td><td><span class="tag tag-reimagine">Reimagine</span></td></tr>
+  <tr><td>Auto-Reorder Suggestions</td><td>System generates purchase order drafts when predicted stockout date falls within lead time window. Requires human approval to execute.</td><td><span class="tag tag-new">New</span></td></tr>
+  <tr><td>Forecast Accuracy Tracking</td><td>Compare predicted vs actual demand over time. Display forecast accuracy percentage to build system trust.</td><td><span class="tag tag-new">New</span></td></tr>
+</table>
+
+<div class="callout">
+  <strong>Algorithm Evolution:</strong> ALG-002 (shortage = max(0, reorderPoint &minus; qtyOnHand)) remains as the fallback.
+  The new predictive layer sits above it: <code>predictedShortage = max(0, forecastedDemand(leadTimeDays) &minus; qtyOnHand + safetyStock)</code>.
+  If forecasting data is insufficient (&lt;90 days of history), the system gracefully degrades to the original ALG-002 logic.
+</div>
+
+<!-- FR-003 -->
+<h3 class="sub pb">4.3 Barcode / QR Code Scanning Integration</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-003</span>
+    <span class="card-title">Enable scan-to-manage inventory operations</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> All item identification on AS/400 was manual keyboard entry of 8-character item IDs (F-003-01, field IMITID). Warehouse staff had to memorize or look up IDs from printed reports.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:30%;">Feature</th><th>Description</th></tr>
+  <tr><td>Camera-Based Scanning</td><td>Use device camera (mobile or webcam) to scan barcodes/QR codes via <code>quagga2</code> or <code>html5-qrcode</code> library. Instant item lookup without typing.</td></tr>
+  <tr><td>Barcode Generation</td><td>Auto-generate Code 128 barcodes and QR codes for each item. Printable labels with item ID, name, warehouse, and category.</td></tr>
+  <tr><td>Scan-to-Count</td><td>Scan an item → system shows current QOH → user enters counted quantity → variance recorded. Supports cycle counting (FR-011).</td></tr>
+  <tr><td>Scan-to-Receive</td><td>Scan incoming shipment items to auto-increment quantityOnHand and log receipt transaction in INVTRN.</td></tr>
+  <tr><td>Batch Scan Mode</td><td>Continuous scanning mode: scan multiple items in sequence, building a batch list for bulk operations (FR-008).</td></tr>
+</table>
+
+<!-- FR-004 -->
+<h3 class="sub">4.4 Multi-Warehouse Transfer Management</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-004</span>
+    <span class="card-title">Enable cross-warehouse stock transfers and consolidated visibility</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> Each inventory item is assigned to a single warehouse (field IMWHSE, DB-001). The legacy system had no concept of transferring stock between warehouses (WH01–WH04). Overstocking in one warehouse and stockouts in another were invisible.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:30%;">Feature</th><th>Description</th></tr>
+  <tr><td>Consolidated Stock View</td><td>New screen showing total quantity across all warehouses per item. Drill-down to per-warehouse breakdown with visual bar chart.</td></tr>
+  <tr><td>Transfer Request Workflow</td><td>Create transfer requests: source warehouse, destination warehouse, item, quantity. Two-step approval: initiate &rarr; confirm receipt.</td></tr>
+  <tr><td>Transfer-in-Transit Status</td><td>New state: TRANSFER_IN_TRANSIT added to item lifecycle. Quantity deducted from source, held in transit, added to destination on confirmation.</td></tr>
+  <tr><td>Optimal Sourcing Suggestion</td><td>When fulfilling demand, system suggests which warehouse to source from based on stock levels, proximity, and cost.</td></tr>
+  <tr><td>Transfer History Log</td><td>All transfers recorded in INVTRN with type='TR'. Full audit trail with timestamps, users, and quantities.</td></tr>
+</table>
+
+<p><strong>Database Changes:</strong> New <code>inventory.whtransfer</code> table for transfer workflow. New INVTRN transaction type 'TR' (transfer). New composite index on (itemId, warehouseCode) for consolidated queries.</p>
+
+<!-- FR-005 -->
+<h3 class="sub">4.5 Complete Audit Trail &amp; Transaction History</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-005</span>
+    <span class="card-title">Activate the dormant INVTRN table with full event sourcing</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> The INVTRN table (DB-005) was defined in V1 migration with fields for transaction type, quantity, date, user, and reference — but <strong>no code writes to it</strong> (SME-004). Every inventory change is currently a silent overwrite with no history.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th>Transaction Type</th><th>Code</th><th>Trigger</th><th>Recorded Data</th></tr>
+  <tr><td>Item Created</td><td>CR</td><td>saveItem() in Add mode</td><td>Initial quantities, cost, price, user, timestamp</td></tr>
+  <tr><td>Item Updated</td><td>UP</td><td>saveItem() in Edit mode</td><td>Changed fields (before/after), user, timestamp</td></tr>
+  <tr><td>Quantity Adjusted</td><td>QA</td><td>Manual quantity change</td><td>Old qty, new qty, adjustment reason, user</td></tr>
+  <tr><td>Status Changed</td><td>SC</td><td>STM-001 transition</td><td>From status, to status, transition ID, user</td></tr>
+  <tr><td>Transfer Out</td><td>TO</td><td>Warehouse transfer (FR-004)</td><td>Source warehouse, quantity, destination, user</td></tr>
+  <tr><td>Transfer In</td><td>TI</td><td>Transfer receipt</td><td>Receiving warehouse, quantity, source, user</td></tr>
+  <tr><td>Stock Received</td><td>SR</td><td>Purchase order receipt</td><td>Supplier, PO reference, quantity, cost, user</td></tr>
+  <tr><td>Cycle Count</td><td>CC</td><td>Cycle count adjustment (FR-011)</td><td>Expected qty, counted qty, variance, user</td></tr>
+</table>
+
+<p><strong>New Screen — SCR-007: Transaction History Viewer</strong></p>
+<ul>
+  <li>Filterable by item ID, transaction type, date range, user, warehouse</li>
+  <li>Timeline visualization showing quantity changes over time</li>
+  <li>Export to CSV/PDF for compliance and audit reporting</li>
+  <li>Linked from item detail screen (SCR-003) via "View History" button</li>
+</ul>
+
+<p><strong>Implementation:</strong> New <code>InventoryTransactionService</code> with <code>@TransactionalEventListener</code> pattern — transaction events are published by existing services and captured asynchronously, ensuring zero performance impact on the primary write path.</p>
+
+<!-- FR-006 -->
+<h3 class="sub pb">4.6 ABC Inventory Classification &amp; Analytics</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-006</span>
+    <span class="card-title">Auto-classify inventory by value contribution using Pareto analysis</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> All inventory items are treated equally in the legacy system. A $0.50 packing material receives the same reorder attention as a $5,000 electronic component. There is no prioritization mechanism.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+
+<table>
+  <tr><th>Class</th><th>Rule</th><th>Typical %</th><th>Management Policy</th></tr>
+  <tr><td><strong>A — Critical</strong></td><td>Top items contributing to 80% of total inventory value</td><td>~20% of items</td><td>Tight control, frequent cycle counts, low safety stock, demand forecasting enabled</td></tr>
+  <tr><td><strong>B — Important</strong></td><td>Next items contributing to 15% of total value</td><td>~30% of items</td><td>Moderate control, quarterly cycle counts, standard reorder process</td></tr>
+  <tr><td><strong>C — Standard</strong></td><td>Remaining items contributing to 5% of value</td><td>~50% of items</td><td>Simplified control, annual counts, higher safety stock to reduce order frequency</td></tr>
+</table>
+
+<p><strong>Algorithm — ALG-004: ABC Classification</strong></p>
+<div class="flow">1. For each ACTIVE item: annualValue = quantityOnHand × unitCost
+2. Sort all items by annualValue descending
+3. Calculate cumulative percentage of total value
+4. Assign class:
+   - A: cumulative% ≤ 80%
+   - B: 80% < cumulative% ≤ 95%
+   - C: cumulative% > 95%
+5. Store classification on entity (new field: abcClass CHAR(1))
+6. Recalculate nightly via scheduled job</div>
+
+<p><strong>New Screen Elements:</strong> ABC class badge on list screen (SCR-002), ABC distribution donut chart on dashboard (FR-001), classification override capability for manual adjustment.</p>
+
+<!-- FR-007 -->
+<h3 class="sub">4.7 Automated Alerts &amp; Notification Engine</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-007</span>
+    <span class="card-title">Push-based alerting for critical inventory events</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> On the AS/400, users discovered problems only when they manually ran reports or navigated to a specific screen. There was no proactive alerting — if a critical item hit zero stock on a Friday, nobody knew until Monday.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:28%;">Alert Type</th><th>Trigger Condition</th><th style="width:18%;">Channel</th></tr>
+  <tr><td>Critical Stock Alert</td><td>quantityOnHand = 0 for any ACTIVE item</td><td>Email, In-App, SMS</td></tr>
+  <tr><td>Reorder Warning</td><td>quantityOnHand ≤ reorderPoint (BR-062)</td><td>In-App, Email digest</td></tr>
+  <tr><td>Predicted Stockout</td><td>Forecasted stockout within lead time window (FR-002)</td><td>In-App, Email</td></tr>
+  <tr><td>High-Value Variance</td><td>Cycle count variance &gt;5% on Class A items (FR-006)</td><td>Email, Manager alert</td></tr>
+  <tr><td>Price Below Cost</td><td>unitPrice &lt; unitCost (BR-045 violation attempt)</td><td>In-App warning</td></tr>
+  <tr><td>Bulk Status Change</td><td>&gt;10 items deactivated in a single day</td><td>Email to admin</td></tr>
+  <tr><td>Supplier Lead Time Breach</td><td>Expected delivery date exceeded</td><td>In-App, Email</td></tr>
+</table>
+
+<p><strong>Architecture:</strong> Event-driven notification engine using Spring Events. Configurable alert preferences per user (notification settings screen). In-app notification bell on AppLayout.tsx header with unread count badge. Email integration via Spring Mail with HTML templates.</p>
+
+<!-- FR-008 -->
+<h3 class="sub">4.8 Bulk Operations &amp; Import/Export</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-008</span>
+    <span class="card-title">Enable mass data operations that were impossible on 5250 terminals</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> Every operation on the AS/400 was one-item-at-a-time via EXFMT display file I/O. Updating 500 items meant 500 manual screen interactions. Importing data required DFU or custom CL programs with strict IBM formatting.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:25%;">Operation</th><th>Description</th></tr>
+  <tr><td>CSV/Excel Import</td><td>Upload spreadsheet of items for bulk creation. Column mapping wizard. Validation preview showing errors before commit. Supports Add and Update modes.</td></tr>
+  <tr><td>CSV/Excel/PDF Export</td><td>Export current list view (with active filters) to downloadable file. Replaces legacy INVRPTR spool file printing. Includes all visible columns plus optional extended fields.</td></tr>
+  <tr><td>Bulk Status Update</td><td>Select multiple items from list → apply status change to all. Respects STM-001 transition rules per item; reports individual failures without rolling back successes.</td></tr>
+  <tr><td>Bulk Price Adjustment</td><td>Apply percentage or flat-rate price change across selected items or category. Preview impact (total value change, affected margins) before confirming.</td></tr>
+  <tr><td>Bulk Category Reassignment</td><td>Move items between categories. Validates target category exists (BR-039) for each item.</td></tr>
+  <tr><td>Template Download</td><td>Download pre-formatted CSV template with headers matching InventoryItemRequestDto fields. Includes sample data and field descriptions.</td></tr>
+</table>
+
+<!-- FR-009 -->
+<h3 class="sub pb">4.9 Supplier Lead Time &amp; Goods Receipt</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-009</span>
+    <span class="card-title">Enrich supplier reference data and enable inventory receipt tracking</span>
+  </div>
+</div>
+
+<div class="callout-warn callout">
+  <strong>Scope Note:</strong> This reimagination has been intentionally scoped to inventory-relevant supplier capabilities only.
+  Purchase Order lifecycle management, Supplier Portal, and Supplier Scorecards belong in a future <strong>Procurement Module</strong>
+  and are explicitly <strong>out of scope</strong> for the Inventory Management application.
+</div>
+
+<p><strong>Legacy Context:</strong> Suppliers exist only as 6-character codes (SUP001–SUP005) in the SUPLMST table. The SupplierReferenceAdapter currently uses a hardcoded static map instead of querying the database. Inventory has no awareness of supplier lead times, making predictive reorder (FR-002) impossible.</p>
+
+<p><strong>In-Scope Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:30%;">Feature</th><th>Description</th><th style="width:12%;">Type</th></tr>
+  <tr><td>Database-Backed Supplier Adapter</td><td>Replace static SupplierReferenceAdapter with JPA-backed adapter querying SUPLMST table. All 3 reference adapters (Category, Supplier, Warehouse) become database-driven, closing GAP-2.</td><td><span class="tag tag-enhance">Enhanced</span></td></tr>
+  <tr><td>Supplier Lead Time Field</td><td>Add <code>lead_time_days</code> (INTEGER) to SUPLMST. Used by FR-002 (Predictive Reorder) to calculate when to trigger reorder: <code>daysOfStockRemaining &lt; supplierLeadTimeDays</code>.</td><td><span class="tag tag-new">New</span></td></tr>
+  <tr><td>Goods Receipt Entry</td><td>Simple receipt screen: select item, enter received quantity, confirm supplier. System auto-updates quantityOnHand and logs SR (Stock Received) transaction in INVTRN. No PO reference required.</td><td><span class="tag tag-new">New</span></td></tr>
+  <tr><td>Receipt Discrepancy Flag</td><td>If received quantity differs from reorderQuantity on item, flag for review. Informational only — does not block receipt.</td><td><span class="tag tag-new">New</span></td></tr>
+</table>
+
+<p><strong>Explicitly Out of Scope (Deferred to Procurement Module):</strong></p>
+<table>
+  <tr><th>Capability</th><th>Reason for Exclusion</th><th>Belongs In</th></tr>
+  <tr><td>Purchase Order CRUD &amp; Lifecycle</td><td>PO management (Draft → Submitted → Shipped → Received → Closed) is procurement domain logic, not inventory</td><td>Procurement Module</td></tr>
+  <tr><td>Supplier Portal</td><td>External-facing supplier self-service portal is a Supplier Relationship Management (SRM) concern</td><td>SRM Module</td></tr>
+  <tr><td>Supplier Scorecards</td><td>On-time delivery %, quality metrics, and supplier ranking belong in procurement analytics</td><td>Procurement Module</td></tr>
+  <tr><td>Automated PO Generation</td><td>Auto-creating POs from reorder suggestions requires procurement approval workflow</td><td>Procurement Module</td></tr>
+</table>
+
+<p><strong>Database:</strong> Extend SUPLMST with <code>lead_time_days</code> INTEGER DEFAULT 7. No new tables required — goods receipts are logged as SR transactions in the existing INVTRN table (activated by FR-005).</p>
+
+<!-- FR-010 -->
+<h3 class="sub">4.10 Mobile-First Warehouse Floor Application</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-010</span>
+    <span class="card-title">Progressive Web App (PWA) optimized for warehouse operations</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> AS/400 access required dedicated 5250 terminals — large, desk-mounted devices. Warehouse staff walked to a terminal station, performed lookups, then walked back to shelves. Disconnected physical workflow created delays and errors.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:25%;">Feature</th><th>Description</th></tr>
+  <tr><td>PWA with Offline Support</td><td>Service worker caches critical data for offline viewing. Queues updates when offline and syncs when connection restores. Works on any mobile browser.</td></tr>
+  <tr><td>Quick-Look Item Card</td><td>Scan barcode (FR-003) → instantly see: item name, QOH, location, reorder status, last movement date. One-tap to adjust quantity.</td></tr>
+  <tr><td>Warehouse Walk-List</td><td>Optimized pick/count list ordered by physical location (aisle → shelf → bin). Minimizes walking distance for cycle counts and order picking.</td></tr>
+  <tr><td>Touch-Optimized Quantity Entry</td><td>Large +/&minus; buttons and numeric keypad for gloved hands. Confirmation haptic feedback.</td></tr>
+  <tr><td>Photo Attachment</td><td>Take photos of damaged goods, shelf labels, or shipment documents. Attached to item record or transaction for evidence.</td></tr>
+</table>
+
+<p><strong>Technical Approach:</strong> Extend existing React app with responsive breakpoints and PWA manifest. Use <code>workbox</code> for service worker. Camera API for barcode scanning. IndexedDB for offline queue. Same Spring Boot REST backend — no server changes required.</p>
+
+<!-- FR-011 -->
+<h3 class="sub">4.11 Cycle Counting &amp; Physical Inventory</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-011</span>
+    <span class="card-title">Replace disruptive full physical inventory with continuous cycle counting</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> The legacy system had no physical inventory or count functionality. Discrepancies between system quantities and actual shelf quantities accumulated silently. The only remedy was offline spreadsheet-based physical counts — a disruptive, labor-intensive annual event.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:28%;">Feature</th><th>Description</th></tr>
+  <tr><td>Count Schedule Generator</td><td>Auto-generate count schedules based on ABC classification (FR-006): Class A = monthly, B = quarterly, C = annually. Distributes counting workload evenly across calendar days.</td></tr>
+  <tr><td>Count Assignment</td><td>Assign specific items to specific users for counting. Track completion status: PENDING → IN_PROGRESS → COMPLETED → REVIEWED.</td></tr>
+  <tr><td>Count Entry &amp; Variance</td><td>User enters physical count → system calculates variance (system QOH vs counted). Auto-flag variances exceeding configurable threshold (default: 5% for A, 10% for B, 15% for C).</td></tr>
+  <tr><td>Variance Investigation</td><td>For flagged variances: require supervisor review and reason code (Damaged, Misplaced, Theft, Receiving Error, Shipping Error, Other). Logged in INVTRN.</td></tr>
+  <tr><td>Auto-Adjustment</td><td>After supervisor approval, system adjusts quantityOnHand to match counted value. Generates QA transaction in INVTRN with full audit trail.</td></tr>
+  <tr><td>Count Accuracy Dashboard</td><td>Track inventory accuracy over time: % of items counted, average variance, accuracy by warehouse/category/ABC class.</td></tr>
+</table>
+
+<!-- FR-012 -->
+<h3 class="sub pb">4.12 Lot Tracking, Expiry &amp; Serial Number Management</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-012</span>
+    <span class="card-title">Enable traceability from receipt through consumption</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> The AS/400 system tracks only aggregate quantities per item (IMQTOH). It has no concept of lots, batches, expiration dates, or serial numbers. If a recall is issued for a specific manufacturing batch, there is no way to identify affected stock.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:25%;">Feature</th><th>Description</th></tr>
+  <tr><td>Lot/Batch Numbers</td><td>Associate received items with lot numbers from suppliers. Track quantity per lot within an item. Enable FIFO (First In, First Out) consumption.</td></tr>
+  <tr><td>Expiry Date Management</td><td>Record expiry date per lot. Dashboard widget showing items expiring within 30/60/90 days. Auto-alert for items nearing expiry (FR-007).</td></tr>
+  <tr><td>Serial Number Tracking</td><td>For high-value items (Class A): assign unique serial numbers. Full lifecycle tracing from receipt → location → issuance → return.</td></tr>
+  <tr><td>Recall Management</td><td>Enter lot number or date range → system identifies all affected stock locations, quantities, and status. Supports quarantine status on affected lots.</td></tr>
+  <tr><td>FEFO Picking Logic</td><td>First Expiry, First Out: when allocating stock, system prioritizes lots with nearest expiry date to minimize waste.</td></tr>
+</table>
+
+<p><strong>Database:</strong> New table <code>inventory.lotmst</code> (lot master): lot_id, item_id, lot_number, supplier_lot_ref, received_date, expiry_date, quantity, status. New table <code>inventory.serialmst</code>: serial_id, item_id, lot_id, serial_number, current_location, status.</p>
+
+<!-- FR-013 -->
+<h3 class="sub">4.13 Inventory Valuation &amp; Costing Methods</h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-013</span>
+    <span class="card-title">Support multiple costing methodologies for financial reporting</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> The current system stores a single <code>unitCost</code> per item — effectively a standard/replacement cost. There is no historical cost tracking, no weighted average calculation, and no FIFO/LIFO costing. ALG-001 calculates margin based solely on the current unit cost.</p>
+
+<p><strong>Reimagined Capability:</strong></p>
+<table>
+  <tr><th style="width:25%;">Costing Method</th><th>Description</th></tr>
+  <tr><td>Standard Cost</td><td>Current approach (preserved): fixed unitCost manually maintained. Variance = actual purchase price &minus; standard cost.</td></tr>
+  <tr><td>Weighted Average Cost</td><td>Recalculate cost on each receipt: <code>newAvgCost = (existingQty × currentCost + receivedQty × purchasePrice) / (existingQty + receivedQty)</code></td></tr>
+  <tr><td>FIFO Costing</td><td>Track cost per lot (FR-012). COGS uses oldest lot cost first. Requires lot-level quantity tracking.</td></tr>
+  <tr><td>LIFO Costing</td><td>COGS uses most recent lot cost first. For tax optimization in specific jurisdictions.</td></tr>
+</table>
+
+<p><strong>New Capabilities:</strong></p>
+<ul>
+  <li><strong>Inventory Valuation Report:</strong> Total value calculated under selected costing method. Compares valuations across methods side-by-side.</li>
+  <li><strong>Margin Re-Calculation:</strong> ALG-001 enhanced to use selected costing method instead of static unitCost. Margin becomes dynamic based on actual historical costs.</li>
+  <li><strong>Cost Variance Analysis:</strong> Dashboard showing purchase price variance (PPV) trends over time, by supplier, by category.</li>
+</ul>
+
+<!-- ==================== CROSS-CUTTING INFRASTRUCTURE ==================== -->
+<h2 class="section pb" style="border-bottom-color:#94a3b8;">Cross-Cutting Infrastructure Prerequisites</h2>
+
+<div class="callout-warn callout">
+  <strong>Scope Classification:</strong> The following two items (FR-014, FR-015) are <strong>not inventory-domain reimaginations</strong> — they are
+  <strong>cross-cutting infrastructure prerequisites</strong> that any production application requires regardless of business domain.
+  They are included in this proposal because the inventory application depends on them, but they are domain-agnostic capabilities
+  that would apply equally to the Payroll module or any other application in the TRTCT004 ecosystem.
+</div>
+
+<!-- FR-014 (was FR-013) -->
+<h3 class="sub">4.14 Role-Based Access Control <span class="tag tag-infra">Infrastructure</span></h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-014</span>
+    <span class="card-title">Secure the application with authentication and granular permissions</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> The AS/400 relied on OS-level security profiles (USRPRF objects) and library-level authority. The migrated application currently has <strong>no authentication or authorization</strong> — every endpoint is publicly accessible.</p>
+
+<p><strong>Why It's Infrastructure, Not Inventory:</strong> Every web application needs authentication and authorization. These roles, JWT tokens, and SSO integration are not specific to inventory management — the same security layer would be needed for Payroll, Procurement, or any other module.</p>
+
+<p><strong>Required Capability:</strong></p>
+<table>
+  <tr><th style="width:15%;">Role</th><th>Permissions</th><th>Use Case</th></tr>
+  <tr><td><strong>Viewer</strong></td><td>Read-only access to all screens. Cannot add, edit, or delete items.</td><td>Auditors, management</td></tr>
+  <tr><td><strong>Operator</strong></td><td>Create/edit items, submit cycle counts, scan operations. Cannot delete or change status.</td><td>Warehouse staff</td></tr>
+  <tr><td><strong>Manager</strong></td><td>All Operator permissions + soft delete, approve cycle count variances, run reports.</td><td>Warehouse managers</td></tr>
+  <tr><td><strong>Admin</strong></td><td>Full access including reference data management, user management, system configuration, bulk operations.</td><td>IT / system admin</td></tr>
+</table>
+
+<p><strong>Implementation:</strong></p>
+<ul>
+  <li>Spring Security with JWT tokens (stateless auth, replacing legacy stateful session model)</li>
+  <li>Warehouse-scoped data isolation: Operators see only their assigned warehouse's items</li>
+  <li>Audit log of all login/logout events and permission-denied attempts</li>
+  <li>PII masking on supplier contact fields (SUPLMST) based on role (addresses GAP in DB-003 PII annotations)</li>
+  <li>OAuth2/OIDC integration for enterprise SSO</li>
+</ul>
+
+<!-- FR-015 (was FR-015) -->
+<h3 class="sub">4.15 API Documentation &amp; Inventory Webhooks <span class="tag tag-infra">Infrastructure</span></h3>
+<div class="card">
+  <div class="card-header">
+    <span class="card-id">FR-015</span>
+    <span class="card-title">Document inventory APIs and enable event-driven integration</span>
+  </div>
+</div>
+
+<p><strong>Legacy Context:</strong> The AS/400 system communicated with other programs only through data queues, data areas, and CALL/PARM — tightly coupled, synchronous, and IBM-only. The migrated system has REST endpoints but no API documentation or event publishing.</p>
+
+<p><strong>Why It's Infrastructure, Not Inventory:</strong> API documentation (OpenAPI/Swagger) and webhook infrastructure are generic platform capabilities. The webhook engine, API key management, rate limiting, and event bus architecture would serve any module — not just inventory.</p>
+
+<p><strong>Inventory-Relevant Scope:</strong></p>
+<table>
+  <tr><th style="width:25%;">Feature</th><th>Description</th></tr>
+  <tr><td>OpenAPI 3.0 Specification</td><td>Auto-generated API documentation via springdoc-openapi for all inventory endpoints. Interactive Swagger UI at /api-docs.</td></tr>
+  <tr><td>Inventory Event Webhooks</td><td>Publish inventory-specific events: item.created, item.updated, item.statusChanged, stock.critical, reorder.triggered. External systems subscribe per event type.</td></tr>
+  <tr><td>Rate Limiting &amp; API Keys</td><td>Protect public API endpoints with rate limiting. API key management for external consumers.</td></tr>
+</table>
+
+<p><strong>Explicitly Out of Scope (Platform-Level Concerns):</strong></p>
+<table>
+  <tr><th>Capability</th><th>Reason</th><th>Belongs In</th></tr>
+  <tr><td>Kafka/Event Bus Infrastructure</td><td>Message broker setup is a platform ops decision, not an inventory feature</td><td>Platform/DevOps</td></tr>
+  <tr><td>ERP/Accounting Feeds</td><td>Cross-system data pipelines span multiple domains</td><td>Integration Layer</td></tr>
+  <tr><td>Payroll System Integration</td><td>Cross-module integration belongs at the platform orchestration level</td><td>Platform/Integration</td></tr>
+</table>
+
+<!-- ==================== 5. IMPLEMENTATION ROADMAP ==================== -->
+<h2 class="section pb">5. Implementation Roadmap</h2>
+
+<h3 class="sub">5.1 Phase Overview</h3>
+
+<table>
+  <tr>
+    <th style="width:10%;">Phase</th>
+    <th style="width:25%;">Theme</th>
+    <th style="width:12%;">Duration</th>
+    <th>Reimaginations Included</th>
+  </tr>
+  <tr>
+    <td><span class="tag tag-phase1">Phase 1</span></td>
+    <td><strong>Foundation &amp; Visibility</strong></td>
+    <td>8–10 weeks</td>
+    <td>FR-005 (Audit Trail), FR-001 (Dashboard), FR-008 (Bulk Ops), FR-014 (RBAC) <span class="tag tag-infra">Infra</span>, FR-015 (API Docs) <span class="tag tag-infra">Infra</span></td>
+  </tr>
+  <tr>
+    <td><span class="tag tag-phase2">Phase 2</span></td>
+    <td><strong>Intelligence &amp; Operations</strong></td>
+    <td>10–12 weeks</td>
+    <td>FR-002 (Predictive Reorder), FR-006 (ABC Class), FR-007 (Alerts), FR-009 (Supplier Lead Time &amp; Receipt), FR-011 (Cycle Count)</td>
+  </tr>
+  <tr>
+    <td><span class="tag tag-phase3">Phase 3</span></td>
+    <td><strong>Advanced &amp; Mobile</strong></td>
+    <td>10–14 weeks</td>
+    <td>FR-003 (Barcode), FR-004 (Multi-Warehouse), FR-010 (Mobile PWA), FR-012 (Lot Tracking), FR-013 (Costing)</td>
+  </tr>
+</table>
+
+<h3 class="sub">5.2 Phase 1 — Foundation &amp; Visibility (Weeks 1–10)</h3>
+<p class="lead">Build the data infrastructure and visibility that all subsequent phases depend on.</p>
+
+<table>
+  <tr><th style="width:6%;">Week</th><th style="width:10%;">FR</th><th>Milestone</th></tr>
+  <tr><td>1–2</td><td>FR-005</td><td>Implement InventoryTransactionService. Wire event listeners to existing saveItem(), softDeleteItem(), and state machine transitions. All CRUD operations now write to INVTRN. Backfill test data.</td></tr>
+  <tr><td>2–3</td><td>FR-014 <span class="tag tag-infra">Infra</span></td><td>Integrate Spring Security with JWT. Define 4 roles (Viewer, Operator, Manager, Admin). Secure all existing endpoints. Add login screen to React app.</td></tr>
+  <tr><td>3–5</td><td>FR-001</td><td>Build dashboard screen (SCR-007). Aggregate queries for KPIs. Stock level visualization. Recent activity feed (powered by FR-005 INVTRN data). Replace SCR-001 menu with dashboard + navigation sidebar.</td></tr>
+  <tr><td>5–7</td><td>FR-008</td><td>CSV import with validation preview. Export current list to CSV/Excel/PDF. Bulk status update from list selection. Replaces ReportPrintAdapterProxy stub (GAP-4).</td></tr>
+  <tr><td>7–8</td><td>FR-015 <span class="tag tag-infra">Infra</span></td><td>Add springdoc-openapi to pom.xml. Annotate all controllers with @Operation. Publish Swagger UI at /api-docs. Configure inventory event webhooks.</td></tr>
+  <tr><td>9–10</td><td>—</td><td>Integration testing, UAT, Phase 1 deployment. Verify all 70+ existing BRs still pass. Run full 120-test suite + new tests.</td></tr>
+</table>
+
+<h3 class="sub">5.3 Phase 2 — Intelligence &amp; Operations (Weeks 11–22)</h3>
+<p class="lead">Layer analytical intelligence and operational workflows on top of the data foundation.</p>
+
+<table>
+  <tr><th style="width:6%;">Week</th><th style="width:10%;">FR</th><th>Milestone</th></tr>
+  <tr><td>11–12</td><td>FR-006</td><td>Implement ALG-004 ABC classification. Add abcClass field to InventoryItemEntity. Nightly scheduled recalculation. ABC badges on list and detail screens.</td></tr>
+  <tr><td>13–15</td><td>FR-002</td><td>Build consumption velocity tracking from INVTRN data. Implement EOQ calculator. Predictive stockout date estimation. Enhanced reorder report (SCR-006) with forecasting columns.</td></tr>
+  <tr><td>15–17</td><td>FR-007</td><td>Event-driven notification engine. 7 alert types. In-app notification center. Email integration. User notification preferences screen.</td></tr>
+  <tr><td>17–19</td><td>FR-009</td><td>Replace static supplier adapter with database-backed JPA adapter. Add lead_time_days to SUPLMST. Build goods receipt entry screen. Wire SR transactions to INVTRN.</td></tr>
+  <tr><td>19–21</td><td>FR-011</td><td>Cycle count schedule generator (driven by FR-006 ABC class). Count assignment, entry, and variance workflow. Auto-adjustment with supervisor approval. Count accuracy dashboard.</td></tr>
+  <tr><td>21–22</td><td>—</td><td>Integration testing, UAT, Phase 2 deployment.</td></tr>
+</table>
+
+<h3 class="sub">5.4 Phase 3 — Advanced &amp; Mobile (Weeks 23–36)</h3>
+<p class="lead">Deliver advanced capabilities and bring the application to the warehouse floor.</p>
+
+<table>
+  <tr><th style="width:6%;">Week</th><th style="width:10%;">FR</th><th>Milestone</th></tr>
+  <tr><td>23–25</td><td>FR-003</td><td>Integrate html5-qrcode library. Camera-based scanning. Barcode generation and label printing. Scan-to-count and scan-to-receive flows.</td></tr>
+  <tr><td>25–28</td><td>FR-004</td><td>Multi-warehouse transfer workflow. Consolidated stock view screen. Transfer-in-transit status. Optimal sourcing algorithm. Transfer audit trail.</td></tr>
+  <tr><td>28–31</td><td>FR-012</td><td>Lot tracking data model. Expiry date management. FEFO picking logic. Recall management screen. Serial number tracking for Class A items.</td></tr>
+  <tr><td>31–33</td><td>FR-013</td><td>Weighted average cost calculation. FIFO/LIFO costing (depends on FR-012 lots). Inventory valuation report. Multi-method margin comparison.</td></tr>
+  <tr><td>33–35</td><td>FR-010</td><td>PWA manifest and service worker. Offline support via workbox. Touch-optimized mobile layouts. Walk-list generation. Photo attachments.</td></tr>
+  <tr><td>35–36</td><td>—</td><td>End-to-end testing, performance tuning, Phase 3 deployment.</td></tr>
+</table>
+
+<!-- ==================== 6. IMPACT ANALYSIS ==================== -->
+<h2 class="section pb">6. Impact Analysis &amp; Priority Matrix</h2>
+
+<h3 class="sub">6.1 Business Value vs Implementation Effort</h3>
+
+<table>
+  <tr>
+    <th style="width:8%;">FR</th>
+    <th style="width:22%;">Reimagination</th>
+    <th style="width:10%;">Business Value</th>
+    <th style="width:10%;">Effort</th>
+    <th style="width:8%;">Phase</th>
+    <th>Rationale</th>
+  </tr>
+  <tr>
+    <td>FR-005</td><td>Audit Trail</td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-low">Low</span></td>
+    <td><span class="tag tag-phase1">P1</span></td>
+    <td>Table exists; just need writers. Unlocks FR-001, FR-002, FR-011 data needs.</td>
+  </tr>
+  <tr>
+    <td>FR-014</td><td>RBAC <span class="tag tag-infra">Infra</span></td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-phase1">P1</span></td>
+    <td>Security is non-negotiable for production. Blocks all external-facing features. Cross-cutting infrastructure.</td>
+  </tr>
+  <tr>
+    <td>FR-001</td><td>Dashboard</td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-phase1">P1</span></td>
+    <td>Highest visibility improvement. Transforms user experience from day one.</td>
+  </tr>
+  <tr>
+    <td>FR-008</td><td>Bulk Operations</td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-phase1">P1</span></td>
+    <td>Massive time savings. Single biggest complaint about legacy one-at-a-time UI.</td>
+  </tr>
+  <tr>
+    <td>FR-002</td><td>Predictive Reorder</td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-phase2">P2</span></td>
+    <td>Highest ROI potential (reduced stockouts + reduced overstock). Needs INVTRN data from P1.</td>
+  </tr>
+  <tr>
+    <td>FR-006</td><td>ABC Classification</td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-low">Low</span></td>
+    <td><span class="tag tag-phase2">P2</span></td>
+    <td>Simple algorithm, high organizational value. Required input for FR-011 counting schedules.</td>
+  </tr>
+  <tr>
+    <td>FR-007</td><td>Alerts</td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-phase2">P2</span></td>
+    <td>Proactive vs reactive. Prevents stockout losses.</td>
+  </tr>
+  <tr>
+    <td>FR-009</td><td>Supplier Lead Time &amp; Receipt <span class="tag tag-scoped">Scoped</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-low">Low</span></td>
+    <td><span class="tag tag-phase2">P2</span></td>
+    <td>Scoped to inventory needs: DB-backed adapter, lead time field, goods receipt. PO/Portal deferred to Procurement module.</td>
+  </tr>
+  <tr>
+    <td>FR-011</td><td>Cycle Counting</td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-phase2">P2</span></td>
+    <td>Eliminates annual physical inventory disruption. Continuous accuracy improvement.</td>
+  </tr>
+  <tr>
+    <td>FR-015</td><td>API Docs &amp; Webhooks <span class="tag tag-infra">Infra</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-low">Low</span></td>
+    <td><span class="tag tag-phase1">P1</span></td>
+    <td>Low effort (annotation-based). Cross-cutting infrastructure. Platform-level concerns (event bus, ERP feeds) deferred.</td>
+  </tr>
+  <tr>
+    <td>FR-003</td><td>Barcode Scanning</td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-phase3">P3</span></td>
+    <td>Significant UX improvement for warehouse floor. Requires mobile support (FR-010).</td>
+  </tr>
+  <tr>
+    <td>FR-004</td><td>Multi-Warehouse</td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-phase3">P3</span></td>
+    <td>Major capability gap. Complex workflow and data model changes.</td>
+  </tr>
+  <tr>
+    <td>FR-010</td><td>Mobile PWA</td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-phase3">P3</span></td>
+    <td>Leverages existing React codebase. Maximum value when combined with FR-003.</td></tr>
+  <tr>
+    <td>FR-012</td><td>Lot Tracking</td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-phase3">P3</span></td>
+    <td>Industry-specific need (pharma, food, chemicals). Required for FR-014 FIFO/LIFO.</td>
+  </tr>
+  <tr>
+    <td>FR-013</td><td>Costing Methods</td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-med">Med</span></td>
+    <td><span class="tag tag-phase3">P3</span></td>
+    <td>Financial reporting accuracy. Depends on FR-012 lot data for FIFO/LIFO.</td>
+  </tr>
+</table>
+
+<!-- ==================== 7. TECHNICAL ARCHITECTURE EVOLUTION ==================== -->
+<h2 class="section pb">7. Technical Architecture Evolution</h2>
+
+<h3 class="sub">7.1 Current Architecture (Post-Migration)</h3>
+<div class="flow">┌─────────────────────────────────────────────────────────────┐
+│                    React 18 Frontend                         │
+│  SCR-001 Menu │ SCR-002 List │ SCR-003 Detail │ SCR-006 Rpt │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ REST API (JSON)
+┌──────────────────────────┴──────────────────────────────────┐
+│                  Spring Boot 3.3 Backend                     │
+│                                                              │
+│  ┌────────────┐  ┌────────────┐  ┌──────────────────┐       │
+│  │ Controllers │→│  Services   │→│   Repositories    │       │
+│  └────────────┘  └────────────┘  └──────────────────┘       │
+│        ↑               ↑                    │                │
+│  ┌─────┴──────┐  ┌─────┴──────┐            │                │
+│  │   DTOs     │  │ Validators │            │                │
+│  └────────────┘  └────────────┘            ↓                │
+│  ┌──────────────────────────────────────────────────┐       │
+│  │  Adapters (Static Maps): Category, Supplier, WH  │       │
+│  └──────────────────────────────────────────────────┘       │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ JPA / Hibernate
+┌──────────────────────────┴──────────────────────────────────┐
+│               PostgreSQL 16 — trtct004                       │
+│   itmmst │ ctgmst │ suplmst │ whsmst │ invtrn (dormant)     │
+└─────────────────────────────────────────────────────────────┘</div>
+
+<h3 class="sub">7.2 Target Architecture (Post-Reimagination)</h3>
+<div class="flow">┌──────────────────────────────────────────────────────────────────┐
+│                    React 18 Frontend + PWA                        │
+│  Dashboard│List│Detail│Reorder│Receipt│CycleCount│History│Mobile │
+│  ┌────────────┐  ┌──────────┐  ┌───────────────┐                │
+│  │ Barcode/QR │  │ Offline  │  │ Notifications │                │
+│  └────────────┘  └──────────┘  └───────────────┘                │
+└──────────────────────────┬───────────────────────────────────────┘
+                           │ REST API (JSON) + WebSocket + SSE
+┌──────────────────────────┴───────────────────────────────────────┐
+│                    Spring Boot 3.3 Backend                        │
+│                                                                   │
+│  ┌──────────┐  ┌──────────────┐  ┌─────────────┐  ┌───────────┐ │
+│  │Controllers│→│   Services    │→│ Repositories  │  │ Scheduled │ │
+│  └──────────┘  └──────────────┘  └─────────────┘  │   Jobs    │ │
+│       ↑         ┌──────┴──────┐        │           └───────────┘ │
+│  ┌────┴───┐     │ New Services│        │                         │
+│  │  DTOs  │     │• Forecast   │        ↓                         │
+│  │  +v2   │     │• ABC Calc   │  ┌──────────────┐               │
+│  └────────┘     │• Audit Log  │  │  Event Bus   │               │
+│                 │• Cycle Count│  │  (Spring)    │               │
+│  ┌──────────┐   │• Receipt   │  └──────┬───────┘               │
+│  │Validators│   │• Alerts    │         │                        │
+│  └──────────┘   │• Transfer  │         ↓                        │
+│                 └─────────────┘  ┌──────────────┐               │
+│  ┌────────────────────────────┐  │  Webhooks &  │               │
+│  │ Adapters (DB-Backed):      │  │  Notifier    │               │
+│  │ Category, Supplier, WH     │  └──────────────┘               │
+│  │ + Outbound: Email, Webhook │                                  │
+│  └────────────────────────────┘                                  │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────────┐│
+│  │ Spring Security (JWT + RBAC) — All endpoints secured         ││
+│  └──────────────────────────────────────────────────────────────┘│
+└──────────────────────────┬───────────────────────────────────────┘
+                           │ JPA / Hibernate + Flyway V6-V12
+┌──────────────────────────┴───────────────────────────────────────┐
+│                     PostgreSQL 16 — trtct004                      │
+│  itmmst (+ abcClass, costMethod) │ ctgmst │ suplmst (+lead_time) │
+│  whsmst │ invtrn (ACTIVE!) │ lotmst │ serialmst                  │
+│  whtransfer │ cyclecount │ count_schedule │ cost_history           │
+│  notifications │ webhook_subs │ api_keys │ users │ roles          │
+└──────────────────────────────────────────────────────────────────┘</div>
+
+<h3 class="sub">7.3 Database Schema Evolution</h3>
+<table>
+  <tr><th>Migration</th><th>Phase</th><th>Changes</th></tr>
+  <tr><td>V6</td><td><span class="tag tag-phase1">P1</span></td><td>Add <code>users</code>, <code>roles</code>, <code>user_roles</code> tables. Add <code>api_keys</code> table.</td></tr>
+  <tr><td>V7</td><td><span class="tag tag-phase1">P1</span></td><td>No schema change — activate INVTRN by wiring service writers.</td></tr>
+  <tr><td>V8</td><td><span class="tag tag-phase2">P2</span></td><td>Add <code>abcClass</code> CHAR(1) to itmmst. Add <code>notifications</code>, <code>notification_prefs</code> tables.</td></tr>
+  <tr><td>V9</td><td><span class="tag tag-phase2">P2</span></td><td>Extend suplmst with <code>lead_time_days</code> INTEGER. Add <code>cyclecount</code>, <code>count_schedule</code> tables.</td></tr>
+  <tr><td>V10</td><td><span class="tag tag-phase3">P3</span></td><td>Add <code>whtransfer</code> table. Add <code>lotmst</code>, <code>serialmst</code> tables.</td></tr>
+  <tr><td>V11</td><td><span class="tag tag-phase3">P3</span></td><td>Add <code>cost_method</code> to itmmst. Add <code>cost_history</code> table. Add <code>webhook_subs</code> table.</td></tr>
+  <tr><td>V12</td><td><span class="tag tag-phase3">P3</span></td><td>Performance indexes for new tables. Materialized views for dashboard aggregates.</td></tr>
+</table>
+
+<!-- ==================== 8. RISK ASSESSMENT ==================== -->
+<h2 class="section pb">8. Risk Assessment &amp; Mitigation</h2>
+
+<table>
+  <tr>
+    <th style="width:5%;">#</th>
+    <th style="width:22%;">Risk</th>
+    <th style="width:10%;">Likelihood</th>
+    <th style="width:10%;">Impact</th>
+    <th>Mitigation Strategy</th>
+  </tr>
+  <tr>
+    <td>R1</td>
+    <td><strong>Regression of existing BRs</strong></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td><span class="tag tag-high">High</span></td>
+    <td>Existing 120 unit tests form the regression suite. Run on every build. Add integration tests per phase. No BR may be modified without explicit approval.</td>
+  </tr>
+  <tr>
+    <td>R2</td>
+    <td><strong>Scope creep across phases</strong></td>
+    <td><span class="tag tag-high">High</span></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td>Strict phase gates. Each FR has defined acceptance criteria. Defer-to-next-phase is the default for overruns.</td>
+  </tr>
+  <tr>
+    <td>R3</td>
+    <td><strong>Data migration complexity</strong></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td>All schema changes via Flyway (V6–V12). Additive-only changes (new columns have defaults). No destructive schema operations.</td>
+  </tr>
+  <tr>
+    <td>R4</td>
+    <td><strong>Performance degradation from audit logging</strong></td>
+    <td><span class="tag tag-low">Low</span></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td>Async event listeners for INVTRN writes. Separate write path from main transaction. Batch insert optimization for bulk operations.</td>
+  </tr>
+  <tr>
+    <td>R5</td>
+    <td><strong>Forecast accuracy insufficient for auto-reorder</strong></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td><span class="tag tag-low">Low</span></td>
+    <td>Graceful degradation to ALG-002 static reorder. Forecast accuracy tracked and displayed. Auto-reorder requires human approval.</td>
+  </tr>
+  <tr>
+    <td>R6</td>
+    <td><strong>Mobile offline sync conflicts</strong></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td>Last-write-wins for quantity adjustments with conflict notification. Conflict resolution screen for manual intervention.</td>
+  </tr>
+  <tr>
+    <td>R7</td>
+    <td><strong>Security vulnerabilities in new endpoints</strong></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td><span class="tag tag-high">High</span></td>
+    <td>FR-013 (RBAC) is Phase 1 priority. All new endpoints secured before any external exposure. OWASP dependency check in CI pipeline.</td>
+  </tr>
+  <tr>
+    <td>R8</td>
+    <td><strong>User adoption resistance</strong></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td><span class="tag tag-med">Medium</span></td>
+    <td>Phased rollout allows gradual adoption. Dashboard (FR-001) provides immediate visible value. Training sessions per phase.</td>
+  </tr>
+</table>
+
+<!-- ==================== 9. SUCCESS METRICS ==================== -->
+<h2 class="section">9. Success Metrics &amp; KPIs</h2>
+
+<table>
+  <tr>
+    <th style="width:5%;">#</th>
+    <th style="width:25%;">Metric</th>
+    <th style="width:18%;">Current Baseline</th>
+    <th style="width:18%;">Phase 1 Target</th>
+    <th style="width:18%;">Phase 3 Target</th>
+  </tr>
+  <tr>
+    <td>M1</td>
+    <td><strong>Inventory Accuracy</strong></td>
+    <td>Unknown (no counting process)</td>
+    <td>Baseline established</td>
+    <td>&ge;98% (cycle counting)</td>
+  </tr>
+  <tr>
+    <td>M2</td>
+    <td><strong>Stockout Frequency</strong></td>
+    <td>Detected reactively only</td>
+    <td>Real-time visibility</td>
+    <td>50% reduction via forecasting</td>
+  </tr>
+  <tr>
+    <td>M3</td>
+    <td><strong>Reorder Lead Time</strong></td>
+    <td>Days (manual report → fax → wait)</td>
+    <td>Same-day visibility</td>
+    <td>&lt;4 hours (auto-PO creation)</td>
+  </tr>
+  <tr>
+    <td>M4</td>
+    <td><strong>Item Maintenance Time</strong></td>
+    <td>~5 min per item (one-at-a-time)</td>
+    <td>&lt;1 min (bulk operations)</td>
+    <td>&lt;30 sec (barcode scan)</td>
+  </tr>
+  <tr>
+    <td>M5</td>
+    <td><strong>Audit Compliance</strong></td>
+    <td>0% (no audit trail)</td>
+    <td>100% (all CRUD logged)</td>
+    <td>100% + lot traceability</td>
+  </tr>
+  <tr>
+    <td>M6</td>
+    <td><strong>Report Generation</strong></td>
+    <td>Manual screen-by-screen only</td>
+    <td>On-demand export</td>
+    <td>Real-time dashboard + PDF</td>
+  </tr>
+  <tr>
+    <td>M7</td>
+    <td><strong>Screens / Capabilities</strong></td>
+    <td>6 screens / ~70 BRs</td>
+    <td>10 screens / ~110 BRs</td>
+    <td>14+ screens / ~180+ BRs</td>
+  </tr>
+  <tr>
+    <td>M8</td>
+    <td><strong>Test Coverage</strong></td>
+    <td>120 unit tests</td>
+    <td>250+ tests (unit + integration)</td>
+    <td>500+ tests (unit + integration + E2E)</td>
+  </tr>
+</table>
+
+<!-- ==================== 10. SUMMARY ==================== -->
+<h2 class="section pb">10. Summary &amp; Recommendation</h2>
+
+<h3 class="sub">10.1 What This Proposal Delivers</h3>
+
+<p>This proposal transforms the TRTCT004 Inventory Management System from a faithfully migrated legacy application into a <strong>modern inventory intelligence platform</strong> through <strong>12 inventory-domain reimaginations</strong> plus <strong>2 cross-cutting infrastructure prerequisites</strong> across 3 phases — all strictly scoped to inventory management:</p>
+
+<div class="two-col">
+  <div>
+    <h4 class="detail">Phase 1 — Foundation (Weeks 1–10)</h4>
+    <ul>
+      <li>Activate dormant audit trail (INVTRN)</li>
+      <li>Secure all endpoints with RBAC</li>
+      <li>Replace static menu with intelligence dashboard</li>
+      <li>Enable bulk operations and data export</li>
+      <li>Publish API documentation</li>
+    </ul>
+  </div>
+  <div>
+    <h4 class="detail">Phase 2 — Intelligence (Weeks 11–22)</h4>
+    <ul>
+      <li>Predictive demand forecasting and EOQ</li>
+      <li>ABC inventory classification</li>
+      <li>Automated notification engine</li>
+      <li>Supplier lead time awareness and goods receipt</li>
+      <li>Cycle counting workflows</li>
+    </ul>
+  </div>
+</div>
+
+<div style="margin-top:8px;">
+  <h4 class="detail">Phase 3 — Advanced (Weeks 23–36)</h4>
+  <ul>
+    <li>Barcode/QR scanning integration</li>
+    <li>Multi-warehouse transfer management</li>
+    <li>Mobile PWA for warehouse floor operations</li>
+    <li>Lot tracking, expiry, and serial number management</li>
+    <li>Inventory valuation and costing methods</li>
+  </ul>
+</div>
+
+<h3 class="sub">10.2 Recommendation</h3>
+
+<div class="callout-success callout">
+  <strong>Recommended Approach:</strong> Begin with <strong>Phase 1</strong> immediately. The five Phase 1 items
+  (3 inventory reimaginations + 2 infrastructure prerequisites) deliver the highest value with the lowest effort:
+  <ul style="margin-top:8px;">
+    <li><strong>FR-005 (Audit Trail)</strong> unlocks data for every subsequent feature — the single most important enabler.</li>
+    <li><strong>FR-014 (RBAC)</strong> <span class="tag tag-infra">Infra</span> is a production deployment prerequisite — no security means no production.</li>
+    <li><strong>FR-001 (Dashboard)</strong> delivers immediate visible value that builds stakeholder confidence.</li>
+    <li><strong>FR-008 (Bulk Operations)</strong> solves the #1 user pain point from the legacy system.</li>
+    <li><strong>FR-015 (API Documentation)</strong> <span class="tag tag-infra">Infra</span> is near-zero effort with springdoc-openapi annotations.</li>
+  </ul>
+  <br>
+  Phase 1 can be delivered in 8–10 weeks while preserving all 70+ existing business rules and 120 unit tests.
+  Each subsequent phase decision should be informed by usage data and business priorities gathered during the preceding phase.
+</div>
+
+<h3 class="sub">10.3 Legacy to Reimagined — The Complete Transformation</h3>
+
+<table>
+  <tr>
+    <th style="width:20%;">Capability</th>
+    <th style="width:27%;">AS/400 Legacy</th>
+    <th style="width:27%;">Current (Migrated)</th>
+    <th style="width:26%;">Reimagined (Proposed)</th>
+  </tr>
+  <tr>
+    <td>Data Entry</td>
+    <td>Keyboard-only, 5250 terminal</td>
+    <td>Web forms, mouse+keyboard</td>
+    <td>Barcode scan, bulk import, auto-feed</td>
+  </tr>
+  <tr>
+    <td>Visibility</td>
+    <td>Run a report to find out</td>
+    <td>Filter and browse lists</td>
+    <td>Real-time dashboard with KPIs</td>
+  </tr>
+  <tr>
+    <td>Reorder</td>
+    <td>Print report → fax to supplier</td>
+    <td>View report on screen</td>
+    <td>Predicted demand → auto-PO draft</td>
+  </tr>
+  <tr>
+    <td>Audit</td>
+    <td>None (overwrite in place)</td>
+    <td>None (INVTRN table dormant)</td>
+    <td>Full event sourcing, every change traced</td>
+  </tr>
+  <tr>
+    <td>Security</td>
+    <td>OS-level user profiles</td>
+    <td>None (open endpoints)</td>
+    <td>JWT + RBAC + warehouse scoping</td>
+  </tr>
+  <tr>
+    <td>Analytics</td>
+    <td>None</td>
+    <td>Margin calculation only</td>
+    <td>ABC classification, forecasting, scorecards</td>
+  </tr>
+  <tr>
+    <td>Mobility</td>
+    <td>Desk-bound terminals only</td>
+    <td>Browser (responsive)</td>
+    <td>PWA with offline, camera, touch</td>
+  </tr>
+  <tr>
+    <td>Integration</td>
+    <td>Data queues, CALL/PARM</td>
+    <td>REST API (internal only)</td>
+    <td>OpenAPI, Webhooks, event bus</td>
+  </tr>
+  <tr>
+    <td>Suppliers</td>
+    <td>6-char code lookup</td>
+    <td>Static map adapter</td>
+    <td>DB-backed adapter, lead time, goods receipt</td>
+  </tr>
+  <tr>
+    <td>Counting</td>
+    <td>Annual physical (offline)</td>
+    <td>No counting capability</td>
+    <td>Continuous cycle counting (ABC-driven)</td>
+  </tr>
+</table>
+
+<div class="footer">
+  <strong>WorkStream Inventory Management</strong> — Functionality Reimagination Proposal v1.1 (Scope Revised)<br>
+  Generated April 28, 2026 &middot; TRTCT004 Inventory Management System &middot; Confidential
+</div>
+
+</body>
+</html>

@@ -20,16 +20,19 @@ interface AppLayoutProps {
   showBack?: boolean;
   backTo?: string;
   children: React.ReactNode;
-  badge?: { label: string; color: 'default' | 'primary' | 'secondary' | 'warning' | 'error' | 'success' | 'info' };
+  badge?: string | { label: string; color: 'default' | 'primary' | 'secondary' | 'warning' | 'error' | 'success' | 'info' };
 }
 
 const ROUTE_LABELS: Record<string, string> = {
   '/inventory/menu': 'Menu',
+  '/inventory/dashboard': 'Dashboard',
   '/inventory/list': 'Item List',
   '/inventory/report/reorder': 'Reorder Report',
+  '/inventory/transactions': 'Transaction History',
+  '/inventory/bulk': 'Bulk Operations',
 };
 
-const AppLayout: React.FC<AppLayoutProps> = ({ title, subtitle, showBack = true, backTo, children, badge }) => {
+const AppLayout: React.FC<AppLayoutProps> = ({ title, subtitle, showBack = true, backTo, children, badge: badgeProp }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,7 +41,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ title, subtitle, showBack = true,
     else navigate(-1);
   };
 
+  const badge = typeof badgeProp === 'string'
+    ? { label: badgeProp, color: 'default' as const }
+    : badgeProp;
+
   const isMenu = location.pathname === '/inventory/menu';
+  const isDashboard = location.pathname === '/inventory/dashboard';
 
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -91,7 +99,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ title, subtitle, showBack = true,
         }}
       >
         <Toolbar sx={{ gap: 1.5, minHeight: { xs: 60, sm: 68 } }}>
-          {showBack && !isMenu && (
+          {showBack && !isMenu && !isDashboard && (
             <IconButton
               color="inherit"
               onClick={handleBack}
@@ -179,7 +187,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ title, subtitle, showBack = true,
 
           {/* Right side */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            {!isMenu && (
+            {!isMenu && !isDashboard && (
               <IconButton
                 size="small"
                 sx={{
@@ -187,7 +195,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ title, subtitle, showBack = true,
                   '&:hover': { color: '#e2e8f0', bgcolor: 'rgba(148,163,184,0.08)' },
                   transition: 'all 0.2s',
                 }}
-                onClick={() => navigate('/inventory/menu')}
+                onClick={() => navigate('/inventory/dashboard')}
               >
                 <HomeIcon fontSize="small" />
               </IconButton>
@@ -212,7 +220,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ title, subtitle, showBack = true,
         </Toolbar>
 
         {/* Breadcrumb — R-08-E */}
-        {!isMenu && (
+        {!isMenu && !isDashboard && (
           <Box sx={{
             px: 2.5, pb: 1.5, pt: 0,
             display: 'flex', alignItems: 'center',
@@ -230,7 +238,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ title, subtitle, showBack = true,
                   display: 'flex', alignItems: 'center', gap: 0.5,
                   transition: 'color 0.15s',
                 }}
-                onClick={() => navigate('/inventory/menu')}
+                onClick={() => navigate('/inventory/dashboard')}
               >
                 Inventory
               </Link>
