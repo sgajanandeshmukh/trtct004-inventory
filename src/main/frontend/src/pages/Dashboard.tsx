@@ -64,7 +64,7 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <AppLayout title="Dashboard" subtitle="Inventory Intelligence" badge="FR-001">
+    <AppLayout title="Dashboard" subtitle="Inventory Intelligence">
       {/* Health Score */}
       <Paper sx={{ p: 3, mb: 3, background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)' }}>
         <Grid container spacing={3} alignItems="center">
