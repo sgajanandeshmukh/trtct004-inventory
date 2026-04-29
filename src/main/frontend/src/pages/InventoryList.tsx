@@ -201,7 +201,6 @@ const InventoryList: React.FC = () => {
                   <TableCell>Category</TableCell>
                   <TableCell align="right">Qty On Hand</TableCell>
                   <TableCell align="right">Unit Price</TableCell>
-                  <TableCell>Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -281,7 +280,6 @@ const InventoryList: React.FC = () => {
                     <TableCell align="right" sx={{ fontFamily: 'monospace', fontWeight: 600, color: '#34d399' }}>
                       ${row.unitPrice?.toFixed(2) ?? '—'}
                     </TableCell>
-                    <TableCell>{getStatusChip(row.status)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -337,6 +337,14 @@ const InventoryItemDetail: React.FC = () => {
                   sx={disabledFieldSx} />
               )} />
             </Grid>
+            <Grid item xs={6} sm={3}>
+              <Controller name="reorderQuantity" control={control} render={({ field }) => (
+                <TextField {...field} label="Reorder Qty" type="number" fullWidth size="small" disabled={!modeConfig.editable}
+                  error={!!errors.reorderQuantity} helperText={errors.reorderQuantity?.message}
+                  inputProps={{ min: 0, style: { fontFamily: 'monospace' } }}
+                  sx={disabledFieldSx} />
+              )} />
+            </Grid>
           </Grid>
         </Paper>
 
