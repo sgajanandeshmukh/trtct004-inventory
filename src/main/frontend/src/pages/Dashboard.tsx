@@ -61,7 +61,6 @@ const Dashboard: React.FC = () => {
     { title: 'Reorder Report', icon: <Assessment />, path: '/inventory/report/reorder', color: '#f59e0b' },
     { title: 'Transaction History', icon: <History />, path: '/inventory/transactions', color: '#8b5cf6' },
     { title: 'Bulk Operations', icon: <Upload />, path: '/inventory/bulk', color: '#ec4899' },
-    { title: 'API Documentation', icon: <BarChart />, path: '', color: '#6366f1', external: '/swagger-ui.html' },
   ];
 
   return (

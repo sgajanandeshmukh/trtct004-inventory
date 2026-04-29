@@ -36,12 +36,13 @@ class InventoryItemServiceTest {
     @Mock private CategoryReferencePort categoryAdapter;
     @Mock private SupplierReferencePort supplierAdapter;
     @Mock private WarehouseReferencePort warehouseAdapter;
+    @Mock private InventoryTransactionService transactionService;
 
     private InventoryItemService service;
 
     @BeforeEach
     void setUp() {
-        service = new InventoryItemService(repository, validator, categoryAdapter, supplierAdapter, warehouseAdapter);
+        service = new InventoryItemService(repository, validator, categoryAdapter, supplierAdapter, warehouseAdapter, transactionService);
     }
 
     private InventoryItemRequestDto validRequest() {

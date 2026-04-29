@@ -55,17 +55,18 @@ public class InventoryListController {
     @GetMapping
     public ResponseEntity<InventoryListResponseDto> displayItemList(
             @RequestParam(required = false) String categoryCode,
-            @RequestParam(required = false) String nameFilter) {
+            @RequestParam(required = false) String nameFilter,
+            @RequestParam(required = false) String status) {
 
-        return ResponseEntity.ok(filterItemList(new InventoryListRequestDto(categoryCode, nameFilter, InventoryConstants.MAX_LIST_SIZE)));
+        return ResponseEntity.ok(filterItemList(new InventoryListRequestDto(categoryCode, nameFilter, InventoryConstants.MAX_LIST_SIZE), status));
     }
 
     /**
      * Filter item list — BR-012/013/014.
      */
-    public InventoryListResponseDto filterItemList(InventoryListRequestDto request) {
+    public InventoryListResponseDto filterItemList(InventoryListRequestDto request, String status) {
         List<InventoryItemEntity> allItems = inventoryItemRepository
-                .findByFilters(request.getCategoryCode(), request.getNameFilter());
+                .findByFilters(request.getCategoryCode(), request.getNameFilter(), status);
 
         // BR-014: Maximum List Size Cap
         List<InventoryListResponseDto.ListRow> rows = allItems.stream()
@@ -92,14 +93,14 @@ public class InventoryListController {
      */
     public InventoryListResponseDto paginateList(InventoryListRequestDto request, int page) {
         // Pagination is handled by pageSize parameter in filterItemList
-        return filterItemList(request);
+        return filterItemList(request, null);
     }
 
     /**
      * Sort item list — BR-011: refreshed list is sorted by item name.
      */
     public InventoryListResponseDto sortItemList(InventoryListRequestDto request) {
-        return filterItemList(request); // DB query already orders by itemName
+        return filterItemList(request, null); // DB query already orders by itemName
     }
 
     /**
@@ -144,13 +145,14 @@ public class InventoryListController {
     @GetMapping("/render")
     public ResponseEntity<InventoryListResponseDto> renderItemList(
             @RequestParam(required = false) String categoryCode,
-            @RequestParam(required = false) String nameFilter) {
-        return displayItemList(categoryCode, nameFilter);
+            @RequestParam(required = false) String nameFilter,
+            @RequestParam(required = false) String status) {
+        return displayItemList(categoryCode, nameFilter, status);
     }
 
     /** Bind list screen for frontend */
     @GetMapping("/bind")
     public ResponseEntity<InventoryListResponseDto> bindListScreen() {
-        return displayItemList(null, null);
+        return displayItemList(null, null, null);
     }
 }

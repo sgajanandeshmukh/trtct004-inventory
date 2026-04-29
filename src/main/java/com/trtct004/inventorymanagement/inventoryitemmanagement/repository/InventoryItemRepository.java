@@ -19,15 +19,18 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItemEnti
      * BR-012: Filter by category code (exact match).
      * BR-013: Filter by name (partial/contains match).
      * BR-014: Maximum list size cap (HV-005).
+     * Status filter: ACTIVE, INACTIVE, or NULL (all).
      */
     @Query(value = "SELECT * FROM inventory.itmmst i " +
            "WHERE (:categoryCode IS NULL OR i.imctgy = :categoryCode) " +
            "AND (:nameFilter IS NULL OR i.imitnm ILIKE CONCAT('%', CAST(:nameFilter AS TEXT), '%')) " +
+           "AND (CAST(:status AS TEXT) IS NULL OR i.imstat = :status) " +
            "ORDER BY i.imitnm",
            nativeQuery = true)
     List<InventoryItemEntity> findByFilters(
             @Param("categoryCode") String categoryCode,
-            @Param("nameFilter") String nameFilter);
+            @Param("nameFilter") String nameFilter,
+            @Param("status") String status);
 
     /**
      * BR-059: Find active items at or below reorder point with positive reorder point.

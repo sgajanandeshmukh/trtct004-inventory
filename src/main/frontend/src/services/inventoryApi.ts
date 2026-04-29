@@ -136,8 +136,8 @@ export const menuApi = {
 
 export const listApi = {
   /** BR-008/009/011: Get item list with optional filters */
-  getList: (categoryCode?: string, nameFilter?: string): Promise<AxiosResponse<InventoryListResponse>> =>
-    apiClient.get('/api/inventory/list', { params: { categoryCode, nameFilter } }),
+  getList: (categoryCode?: string, nameFilter?: string, status?: string): Promise<AxiosResponse<InventoryListResponse>> =>
+    apiClient.get('/api/inventory/list', { params: { categoryCode, nameFilter, status } }),
 
   /** DT-002: Perform row action (2=Edit, 4=Delete, 5=Display) */
   rowAction: (itemId: string, actionCode: string): Promise<AxiosResponse<unknown>> =>

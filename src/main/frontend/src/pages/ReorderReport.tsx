@@ -90,7 +90,7 @@ const ReorderReport: React.FC = () => {
   };
 
   return (
-    <AppLayout title="Reorder Report" subtitle="Items below reorder point requiring replenishment" backTo="/inventory/menu">
+    <AppLayout title="Reorder Report" subtitle="Items below reorder point requiring replenishment" backTo="/inventory/dashboard">
       {/* Filter bar */}
       <Paper elevation={0} sx={{
         p: 2.5, mb: 3, borderRadius: 3,

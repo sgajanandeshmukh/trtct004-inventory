@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Box, Typography, TextField, Button, Table, TableHead, TableRow, TableCell,
   TableBody, Paper, IconButton, Tooltip, Chip, InputAdornment,
-  Snackbar, Alert, Skeleton, Stack, TableContainer
+  Snackbar, Alert, Skeleton, Stack, TableContainer, ToggleButtonGroup, ToggleButton,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -28,6 +28,7 @@ const InventoryList: React.FC = () => {
   const [items, setItems] = useState<InventoryListRow[]>([]);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [nameFilter, setNameFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
   const [noRecords, setNoRecords] = useState(false);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
@@ -40,7 +41,8 @@ const InventoryList: React.FC = () => {
   const loadList = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await listApi.getList(categoryFilter || undefined, nameFilter || undefined);
+      const statusParam = statusFilter === 'ALL' ? undefined : statusFilter;
+      const response = await listApi.getList(categoryFilter || undefined, nameFilter || undefined, statusParam);
       setItems(response.data.items);
       setNoRecords(response.data.noRecordsFound);
     } catch {
@@ -49,7 +51,7 @@ const InventoryList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [categoryFilter, nameFilter]);
+  }, [categoryFilter, nameFilter, statusFilter]);
 
   useEffect(() => { loadList(); }, [loadList]);
 
@@ -92,7 +94,7 @@ const InventoryList: React.FC = () => {
   };
 
   return (
-    <AppLayout title="Inventory Item List" subtitle="Browse and manage inventory records" backTo="/inventory/menu">
+    <AppLayout title="Inventory Item List" subtitle="Browse and manage inventory records" backTo="/inventory/dashboard">
       <Paper
         elevation={0}
         sx={{
@@ -128,6 +130,23 @@ const InventoryList: React.FC = () => {
               startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" sx={{ color: '#64748b' }} /></InputAdornment>,
             }}
           />
+          <ToggleButtonGroup
+            value={statusFilter}
+            exclusive
+            onChange={(_, val) => { if (val) setStatusFilter(val); }}
+            size="small"
+            sx={{
+              '& .MuiToggleButton-root': {
+                textTransform: 'none', fontSize: '0.75rem', px: 1.5, py: 0.5,
+                color: '#94a3b8', borderColor: 'rgba(148,163,184,0.2)',
+                '&.Mui-selected': { bgcolor: 'rgba(99,102,241,0.15)', color: '#818cf8', borderColor: 'rgba(99,102,241,0.3)' },
+              },
+            }}
+          >
+            <ToggleButton value="ALL">All</ToggleButton>
+            <ToggleButton value="ACTIVE">Active</ToggleButton>
+            <ToggleButton value="INACTIVE">Inactive</ToggleButton>
+          </ToggleButtonGroup>
           <Tooltip title="Refresh list">
             <IconButton
               onClick={loadList}

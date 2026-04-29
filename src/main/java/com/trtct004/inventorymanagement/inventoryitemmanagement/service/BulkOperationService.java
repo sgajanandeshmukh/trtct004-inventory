@@ -25,7 +25,7 @@ public class BulkOperationService {
     }
 
     public String exportToCsv(String categoryCode, String nameFilter) {
-        List<InventoryItemEntity> items = itemRepository.findByFilters(categoryCode, nameFilter);
+        List<InventoryItemEntity> items = itemRepository.findByFilters(categoryCode, nameFilter, null);
         StringBuilder sb = new StringBuilder();
         sb.append("Item ID,Item Name,Description,Category,Qty On Hand,Qty Allocated,Qty On Order,");
         sb.append("Reorder Point,Reorder Qty,Unit Cost,Unit Price,Supplier,Warehouse,Status,Last Updated\n");
